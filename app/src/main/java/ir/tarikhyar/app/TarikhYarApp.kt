@@ -21,6 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import ir.tarikhyar.app.feature.age.AgeScreen
@@ -29,24 +30,41 @@ import ir.tarikhyar.app.feature.home.HomeScreen
 import ir.tarikhyar.app.feature.insights.InsightsScreen
 import ir.tarikhyar.app.feature.tools.ToolsScreen
 
-enum class AppScreen(val label: String) { HOME("خانه"), AGE("سن"), INSIGHTS("تولد"), DIFFERENCE("اختلاف"), TOOLS("ابزارها") }
+enum class AppScreen(val label: String) { HOME("خانه"), AGE("سن"), INSIGHTS("تولد"), DIFFERENCE("تاریخ‌ها"), TOOLS("بیشتر") }
 
 @Composable
 fun TarikhYarApp() {
     var currentScreen by rememberSaveable { mutableStateOf(AppScreen.HOME) }
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-        Scaffold(containerColor = MaterialTheme.colorScheme.background, bottomBar = {
-            NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
-                AppScreen.entries.forEach { screen ->
-                    val icon = when (screen) {
-                        AppScreen.HOME -> Icons.Rounded.Home; AppScreen.AGE -> Icons.Rounded.Cake
-                        AppScreen.INSIGHTS -> Icons.Rounded.Stars; AppScreen.DIFFERENCE -> Icons.Rounded.DateRange
-                        AppScreen.TOOLS -> Icons.Rounded.Apps
+        Scaffold(
+            containerColor = MaterialTheme.colorScheme.background,
+            bottomBar = {
+                NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
+                    AppScreen.entries.forEach { screen ->
+                        val icon = when (screen) {
+                            AppScreen.HOME -> Icons.Rounded.Home
+                            AppScreen.AGE -> Icons.Rounded.Cake
+                            AppScreen.INSIGHTS -> Icons.Rounded.Stars
+                            AppScreen.DIFFERENCE -> Icons.Rounded.DateRange
+                            AppScreen.TOOLS -> Icons.Rounded.Apps
+                        }
+                        NavigationBarItem(
+                            selected = currentScreen == screen,
+                            onClick = { currentScreen = screen },
+                            icon = { Icon(icon, screen.label) },
+                            label = { Text(screen.label) },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = MaterialTheme.colorScheme.primary,
+                                selectedTextColor = MaterialTheme.colorScheme.primary,
+                                indicatorColor = MaterialTheme.colorScheme.primaryContainer,
+                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            ),
+                        )
                     }
-                    NavigationBarItem(selected = currentScreen == screen, onClick = { currentScreen = screen }, icon = { Icon(icon, screen.label) }, label = { Text(screen.label) }, colors = NavigationBarItemDefaults.colors(indicatorColor = MaterialTheme.colorScheme.primaryContainer))
                 }
-            }
-        }) { innerPadding ->
+            },
+        ) { innerPadding ->
             when (currentScreen) {
                 AppScreen.HOME -> HomeScreen({ currentScreen = it }, Modifier.padding(innerPadding))
                 AppScreen.AGE -> AgeScreen(Modifier.padding(innerPadding))

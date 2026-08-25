@@ -17,35 +17,37 @@ import androidx.compose.ui.unit.sp
 private val LightColors = lightColorScheme(
     primary = PrimaryLight, onPrimary = OnPrimaryLight,
     primaryContainer = PrimaryContainerLight, onPrimaryContainer = OnPrimaryContainerLight,
-    secondary = SecondaryLight, background = BackgroundLight,
-    surface = SurfaceLight, surfaceVariant = SurfaceVariantLight,
-    onSurface = OnSurfaceLight, onSurfaceVariant = OnSurfaceVariantLight,
+    secondary = SecondaryLight, tertiary = TertiaryLight,
+    background = BackgroundLight, surface = SurfaceLight,
+    surfaceVariant = SurfaceVariantLight, onSurface = OnSurfaceLight,
+    onSurfaceVariant = OnSurfaceVariantLight, outline = OutlineLight,
 )
 
 private val DarkColors = darkColorScheme(
     primary = PrimaryDark, onPrimary = OnPrimaryDark,
     primaryContainer = PrimaryContainerDark, onPrimaryContainer = OnPrimaryContainerDark,
-    secondary = SecondaryDark, background = BackgroundDark,
-    surface = SurfaceDark, surfaceVariant = SurfaceVariantDark,
-    onSurface = OnSurfaceDark, onSurfaceVariant = OnSurfaceVariantDark,
+    secondary = SecondaryDark, tertiary = TertiaryDark,
+    background = BackgroundDark, surface = SurfaceDark,
+    surfaceVariant = SurfaceVariantDark, onSurface = OnSurfaceDark,
+    onSurfaceVariant = OnSurfaceVariantDark, outline = OutlineDark,
 )
 
-// A softer, friendlier system typeface is preferred for V1.3. Persian glyphs
-// gracefully fall back to the device Persian font where a cursive glyph is unavailable.
-private val SoftFamily = FontFamily.Cursive
+// V1.4 removes the cursive Latin font from V1.3. Default Android typography keeps
+// English/Latin text clean while Persian remains soft and readable on the device.
 private val AppTypography = Typography(
-    headlineLarge = TextStyle(fontFamily = SoftFamily, fontWeight = FontWeight.Bold, fontSize = 32.sp, lineHeight = 42.sp),
-    headlineMedium = TextStyle(fontFamily = SoftFamily, fontWeight = FontWeight.Bold, fontSize = 25.sp, lineHeight = 34.sp),
-    titleLarge = TextStyle(fontFamily = SoftFamily, fontWeight = FontWeight.Bold, fontSize = 21.sp, lineHeight = 30.sp),
-    titleMedium = TextStyle(fontFamily = SoftFamily, fontWeight = FontWeight.SemiBold, fontSize = 17.sp, lineHeight = 26.sp),
-    bodyLarge = TextStyle(fontFamily = SoftFamily, fontWeight = FontWeight.Normal, fontSize = 17.sp, lineHeight = 28.sp),
-    bodyMedium = TextStyle(fontFamily = SoftFamily, fontWeight = FontWeight.Normal, fontSize = 15.sp, lineHeight = 24.sp),
-    labelLarge = TextStyle(fontFamily = SoftFamily, fontWeight = FontWeight.SemiBold, fontSize = 15.sp),
+    headlineLarge = TextStyle(fontFamily = FontFamily.Default, fontWeight = FontWeight.ExtraBold, fontSize = 30.sp, lineHeight = 39.sp),
+    headlineMedium = TextStyle(fontFamily = FontFamily.Default, fontWeight = FontWeight.ExtraBold, fontSize = 24.sp, lineHeight = 33.sp),
+    titleLarge = TextStyle(fontFamily = FontFamily.Default, fontWeight = FontWeight.Bold, fontSize = 20.sp, lineHeight = 29.sp),
+    titleMedium = TextStyle(fontFamily = FontFamily.Default, fontWeight = FontWeight.Bold, fontSize = 17.sp, lineHeight = 26.sp),
+    bodyLarge = TextStyle(fontFamily = FontFamily.Default, fontWeight = FontWeight.Medium, fontSize = 16.sp, lineHeight = 27.sp),
+    bodyMedium = TextStyle(fontFamily = FontFamily.Default, fontWeight = FontWeight.Normal, fontSize = 14.sp, lineHeight = 23.sp),
+    labelLarge = TextStyle(fontFamily = FontFamily.Default, fontWeight = FontWeight.SemiBold, fontSize = 14.sp),
+    labelMedium = TextStyle(fontFamily = FontFamily.Default, fontWeight = FontWeight.Medium, fontSize = 12.sp),
 )
 
 private val AppShapes = Shapes(
-    extraSmall = RoundedCornerShape(12.dp), small = RoundedCornerShape(16.dp),
-    medium = RoundedCornerShape(22.dp), large = RoundedCornerShape(28.dp),
+    extraSmall = RoundedCornerShape(10.dp), small = RoundedCornerShape(15.dp),
+    medium = RoundedCornerShape(20.dp), large = RoundedCornerShape(27.dp),
     extraLarge = RoundedCornerShape(34.dp),
 )
 

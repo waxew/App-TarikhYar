@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -27,9 +26,10 @@ import ir.tarikhyar.app.core.date.PersianDate
 import ir.tarikhyar.app.core.format.PersianFormat
 import ir.tarikhyar.app.ui.components.DateFields
 import ir.tarikhyar.app.ui.components.ErrorText
-import ir.tarikhyar.app.ui.components.PrimaryButton
+import ir.tarikhyar.app.ui.components.GradientHeroButton
 import ir.tarikhyar.app.ui.components.ResultCard
 import ir.tarikhyar.app.ui.components.ScreenHeader
+import ir.tarikhyar.app.ui.components.SoftSectionCard
 import ir.tarikhyar.app.ui.components.StatTile
 import ir.tarikhyar.app.ui.components.parsePersianDate
 import java.time.LocalDate
@@ -41,14 +41,14 @@ fun AgeScreen(modifier: Modifier = Modifier) {
     var result by remember { mutableStateOf<DateCalculations.AgeResult?>(null) }
     val today = remember { PersianCalendar.fromGregorian(LocalDate.now()) }
 
-    LazyColumn(modifier.fillMaxSize(), contentPadding = PaddingValues(18.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
-        item { ScreenHeader("محاسبه سن", "سن دقیق، شمع تولد، زمان سپری‌شده و تولد بعدی") }
+    LazyColumn(modifier.fillMaxSize(), contentPadding = PaddingValues(18.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        item { ScreenHeader("محاسبه سن", "تاریخ تولد را وارد کن و نتیجه کامل را در کارت‌های گرافیکی ببین") }
         item {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            SoftSectionCard {
                 Text("تاریخ تولد", style = MaterialTheme.typography.titleMedium)
                 DateFields(year, month, day, { year = it }, { month = it }, { day = it })
                 ErrorText(error)
-                PrimaryButton("محاسبه سن") {
+                GradientHeroButton("مشاهده نتیجه") {
                     val b = parsePersianDate(year, month, day)
                     when {
                         b == null -> { error = "تاریخ واردشده معتبر نیست."; result = null; birth = null }
@@ -67,16 +67,15 @@ private fun AgeResultContent(birth: PersianDate, today: PersianDate, result: Dat
     val info = remember(birth) { BirthInsights.calendarInfo(birth) }
     val legal = remember(birth) { PersianCalendar.addYears(birth, 18) }
     val daysToLegal = if (PersianCalendar.compare(today, legal) >= 0) 0L else PersianCalendar.daysBetween(today, legal)
-    val hours = result.totalDays * 24L
-    val minutes = hours * 60L
-    val seconds = minutes * 60L
+    val hours = result.totalDays * 24L; val minutes = hours * 60L; val seconds = minutes * 60L
     Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
         ResultCard {
-            Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text("سن دقیق شما")
-                Text("${PersianFormat.digits(result.period.years)} سال", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
-                Text("${PersianFormat.digits(result.period.months)} ماه و ${PersianFormat.digits(result.period.days)} روز", style = MaterialTheme.typography.titleMedium)
-                Text("🎂 ${PersianFormat.digits(result.period.years)} شمع روی کیک", color = MaterialTheme.colorScheme.primary)
+            Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("سن دقیق شما", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+                    BigAgeNumber("سال", result.period.years); BigAgeNumber("ماه", result.period.months); BigAgeNumber("روز", result.period.days)
+                }
+                Text("🎂 ${PersianFormat.digits(result.period.years)} شمع روی کیک تولد", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
             }
         }
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -86,22 +85,43 @@ private fun AgeResultContent(birth: PersianDate, today: PersianDate, result: Dat
             StatTile("روز زندگی", PersianFormat.number(result.totalDays), Modifier.weight(1f)); StatTile("تا تولد بعدی", if (result.nextBirthdayDays == 0L) "امروز" else "${PersianFormat.number(result.nextBirthdayDays)} روز", Modifier.weight(1f))
         }
         ResultCard {
-            Text("زمان سپری‌شده", style = MaterialTheme.typography.titleLarge)
-            Text("${PersianFormat.number(hours)} ساعت")
-            Text("${PersianFormat.number(minutes)} دقیقه")
-            Text("${PersianFormat.number(seconds)} ثانیه")
+            Text("تولد شما در تقویم‌های دیگر", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.primary)
+            InfoLine("شمسی", PersianFormat.persianDate(birth))
+            InfoLine("میلادی", "${info.gregorian.year}/${info.gregorian.monthValue}/${info.gregorian.dayOfMonth} • ${info.gregorianMonthName}")
+            InfoLine("قمری", "${info.hijriYear}/${info.hijriMonth}/${info.hijriDay} • ${info.hijriMonthName}")
+            InfoLine("روز هفته تولد", PersianFormat.weekday(result.birthWeekday))
         }
         ResultCard {
-            Text("تولد شما در تقویم‌های دیگر", style = MaterialTheme.typography.titleLarge)
-            Text("میلادی: ${info.gregorian.year}/${info.gregorian.monthValue}/${info.gregorian.dayOfMonth} (${info.gregorianMonthName})")
-            Text("قمری: ${info.hijriYear}/${info.hijriMonth}/${info.hijriDay} (${info.hijriMonthName})")
-            Text("روز تولد: ${PersianFormat.weekday(result.birthWeekday)}")
-            Text("حیوان سال: ${info.iranianAnimal} • چینی: ${info.chineseAnimal}")
+            Text("حیوان سال و طالع", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.primary)
+            InfoLine("حیوان سال ایرانی", info.iranianAnimal)
+            InfoLine("حیوان سال چینی", info.chineseAnimal)
+            InfoLine("نام سال ترکی", info.turkicAnimal)
+            InfoLine("برج میلادی", info.westernSign)
         }
         ResultCard {
-            Text("سن ۱۸ سال", style = MaterialTheme.typography.titleLarge)
-            Text("تاریخ: ${PersianFormat.persianDate(legal)}")
-            Text(if (daysToLegal == 0L) "۱۸ سالگی تکمیل شده است." else "${PersianFormat.number(daysToLegal)} روز تا ۱۸ سالگی")
+            Text("ساعت زندگی", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.primary)
+            InfoLine("ساعت", PersianFormat.number(hours)); InfoLine("دقیقه", PersianFormat.number(minutes)); InfoLine("ثانیه", PersianFormat.number(seconds))
         }
+        ResultCard {
+            Text("سن قانونی", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.primary)
+            InfoLine("تاریخ کامل شدن ۱۸ سال", PersianFormat.persianDate(legal))
+            Text(if (daysToLegal == 0L) "۱۸ سالگی تکمیل شده است." else "${PersianFormat.number(daysToLegal)} روز تا ۱۸ سالگی", color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+    }
+}
+
+@Composable
+private fun BigAgeNumber(label: String, value: Int) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(PersianFormat.digits(value), style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.primary)
+        Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
+@Composable
+private fun InfoLine(label: String, value: String) {
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(value, style = MaterialTheme.typography.titleMedium)
     }
 }

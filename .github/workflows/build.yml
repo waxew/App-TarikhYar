@@ -1,4 +1,4 @@
-name: Build TarikhYar V1.3
+name: Build TarikhYar V1.4
 
 on:
   push:
@@ -37,13 +37,13 @@ jobs:
       - name: Run unit tests
         run: gradle testDebugUnitTest --stacktrace
 
-      - name: Build installable APK
-        run: gradle assembleDebug --stacktrace
+      - name: Build release APK
+        run: gradle assembleRelease --stacktrace
 
-      - name: Upload APK
+      - name: Upload release APK
         uses: actions/upload-artifact@v4
         with:
-          name: TarikhYar-v1.3.0-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: TarikhYar-v1.4.0-release-unsigned
+          path: app/build/outputs/apk/release/app-release-unsigned.apk
           if-no-files-found: error
           retention-days: 14
