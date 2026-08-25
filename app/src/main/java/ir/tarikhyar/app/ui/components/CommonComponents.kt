@@ -1,5 +1,7 @@
 package ir.tarikhyar.app.ui.components
 
+import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,11 +15,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -33,8 +39,73 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import ir.tarikhyar.app.core.date.PersianCalendar
 import ir.tarikhyar.app.core.date.PersianDate
+
+@Composable
+fun AppTopBar(title: String, onBack: () -> Unit, onShare: () -> Unit) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.surface,
+        shadowElevation = 1.dp,
+    ) {
+        Box(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 6.dp, vertical = 6.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            IconButton(onClick = onBack, modifier = Modifier.align(Alignment.CenterStart)) {
+                Icon(Icons.Rounded.ArrowBack, contentDescription = "بازگشت", tint = MaterialTheme.colorScheme.onSurface)
+            }
+            Text(title, style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.primary)
+            IconButton(onClick = onShare, modifier = Modifier.align(Alignment.CenterEnd)) {
+                Icon(Icons.Rounded.Share, contentDescription = "اشتراک‌گذاری", tint = MaterialTheme.colorScheme.onSurface)
+            }
+        }
+    }
+}
+
+@Composable
+fun EmojiBadge(
+    emoji: String,
+    modifier: Modifier = Modifier,
+    background: Color = MaterialTheme.colorScheme.primaryContainer,
+    size: Int = 54,
+) {
+    Surface(modifier = modifier.size(size.dp), shape = CircleShape, color = background) {
+        Box(contentAlignment = Alignment.Center) {
+            Text(emoji, fontSize = (size * 0.52f).sp)
+        }
+    }
+}
+
+@Composable
+fun GraphicMenuCard(
+    title: String,
+    emoji: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    subtitle: String? = null,
+) {
+    Card(
+        modifier = modifier.clickable(onClick = onClick),
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(13.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(7.dp),
+        ) {
+            EmojiBadge(emoji = emoji, size = 58)
+            Text(title, style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center)
+            if (!subtitle.isNullOrBlank()) {
+                Text(subtitle, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
+            }
+        }
+    }
+}
 
 @Composable
 fun ScreenHeader(title: String, subtitle: String) {
@@ -162,6 +233,15 @@ fun StatTile(label: String, value: String, modifier: Modifier = Modifier) {
             Text(label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
         }
     }
+}
+
+fun shareText(context: Context, title: String, text: String) {
+    val intent = Intent(Intent.ACTION_SEND).apply {
+        type = "text/plain"
+        putExtra(Intent.EXTRA_SUBJECT, title)
+        putExtra(Intent.EXTRA_TEXT, text)
+    }
+    context.startActivity(Intent.createChooser(intent, "اشتراک‌گذاری"))
 }
 
 fun parsePersianDate(year: String, month: String, day: String): PersianDate? {
