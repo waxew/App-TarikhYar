@@ -3,7 +3,7 @@ package ir.tarikhyar.app.core.date
 import java.time.LocalDate
 import java.time.chrono.HijrahDate
 import java.time.temporal.ChronoField
-import kotlin.math.floorMod
+import java.lang.Math.floorMod
 
 object BirthInsights {
     data class CalendarInfo(
