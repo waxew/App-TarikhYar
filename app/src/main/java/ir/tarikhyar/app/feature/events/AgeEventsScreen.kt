@@ -26,7 +26,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import ir.tarikhyar.app.core.date.BirthInsights
 import ir.tarikhyar.app.core.date.PersianCalendar
 import ir.tarikhyar.app.core.date.PersianDate
 import ir.tarikhyar.app.core.format.PersianFormat
@@ -88,7 +87,6 @@ fun AgeEventsScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
 
 @Composable
 private fun EventsList(birth: PersianDate) {
-    val milestones = remember(birth) { BirthInsights.milestones(birth) }
     val extra = listOf(
         EventItem("سن قانونی (۱۸ سالگی)", 18, "⚖️", Color(0xFFFFB62F)),
         EventItem("پیش‌دبستانی یک", 4, "🏫", Color(0xFFFFA641)),
@@ -103,13 +101,12 @@ private fun EventsList(birth: PersianDate) {
     )
 
     Column(verticalArrangement = Arrangement.spacedBy(9.dp)) {
-        extra.forEachIndexed { index, item ->
-            val date = PersianCalendar.addYears(birth, item.age)
+        extra.forEach { item ->
+            val date = PersianCalendar.addYears(birth, item.age.toLong())
             EventRow(
                 item = item,
                 date = date,
                 isPast = PersianCalendar.compare(date, PersianCalendar.fromGregorian(LocalDate.now())) <= 0,
-                index = index,
             )
         }
 
@@ -126,7 +123,7 @@ private fun EventsList(birth: PersianDate) {
 }
 
 @Composable
-private fun EventRow(item: EventItem, date: PersianDate, isPast: Boolean, index: Int) {
+private fun EventRow(item: EventItem, date: PersianDate, isPast: Boolean) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.large,
