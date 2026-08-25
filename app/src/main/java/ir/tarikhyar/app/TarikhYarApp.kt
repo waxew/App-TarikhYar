@@ -6,6 +6,7 @@ import androidx.compose.material.icons.rounded.Apps
 import androidx.compose.material.icons.rounded.Cake
 import androidx.compose.material.icons.rounded.DateRange
 import androidx.compose.material.icons.rounded.Home
+import androidx.compose.material.icons.rounded.Stars
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -25,52 +26,33 @@ import androidx.compose.ui.unit.LayoutDirection
 import ir.tarikhyar.app.feature.age.AgeScreen
 import ir.tarikhyar.app.feature.difference.DifferenceScreen
 import ir.tarikhyar.app.feature.home.HomeScreen
+import ir.tarikhyar.app.feature.insights.InsightsScreen
 import ir.tarikhyar.app.feature.tools.ToolsScreen
 
-enum class AppScreen(val label: String) {
-    HOME("خانه"),
-    AGE("سن"),
-    DIFFERENCE("اختلاف"),
-    TOOLS("ابزارها"),
-}
+enum class AppScreen(val label: String) { HOME("خانه"), AGE("سن"), INSIGHTS("تولد"), DIFFERENCE("اختلاف"), TOOLS("ابزارها") }
 
 @Composable
 fun TarikhYarApp() {
     var currentScreen by rememberSaveable { mutableStateOf(AppScreen.HOME) }
-
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-        Scaffold(
-            containerColor = MaterialTheme.colorScheme.background,
-            bottomBar = {
-                NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
-                    AppScreen.entries.forEach { screen ->
-                        val icon = when (screen) {
-                            AppScreen.HOME -> Icons.Rounded.Home
-                            AppScreen.AGE -> Icons.Rounded.Cake
-                            AppScreen.DIFFERENCE -> Icons.Rounded.DateRange
-                            AppScreen.TOOLS -> Icons.Rounded.Apps
-                        }
-                        NavigationBarItem(
-                            selected = currentScreen == screen,
-                            onClick = { currentScreen = screen },
-                            icon = { Icon(icon, contentDescription = screen.label) },
-                            label = { Text(screen.label) },
-                            colors = NavigationBarItemDefaults.colors(
-                                indicatorColor = MaterialTheme.colorScheme.primaryContainer,
-                            ),
-                        )
+        Scaffold(containerColor = MaterialTheme.colorScheme.background, bottomBar = {
+            NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
+                AppScreen.entries.forEach { screen ->
+                    val icon = when (screen) {
+                        AppScreen.HOME -> Icons.Rounded.Home; AppScreen.AGE -> Icons.Rounded.Cake
+                        AppScreen.INSIGHTS -> Icons.Rounded.Stars; AppScreen.DIFFERENCE -> Icons.Rounded.DateRange
+                        AppScreen.TOOLS -> Icons.Rounded.Apps
                     }
+                    NavigationBarItem(selected = currentScreen == screen, onClick = { currentScreen = screen }, icon = { Icon(icon, screen.label) }, label = { Text(screen.label) }, colors = NavigationBarItemDefaults.colors(indicatorColor = MaterialTheme.colorScheme.primaryContainer))
                 }
-            },
-        ) { innerPadding ->
+            }
+        }) { innerPadding ->
             when (currentScreen) {
-                AppScreen.HOME -> HomeScreen(
-                    modifier = Modifier.padding(innerPadding),
-                    onNavigate = { currentScreen = it },
-                )
-                AppScreen.AGE -> AgeScreen(modifier = Modifier.padding(innerPadding))
-                AppScreen.DIFFERENCE -> DifferenceScreen(modifier = Modifier.padding(innerPadding))
-                AppScreen.TOOLS -> ToolsScreen(modifier = Modifier.padding(innerPadding))
+                AppScreen.HOME -> HomeScreen({ currentScreen = it }, Modifier.padding(innerPadding))
+                AppScreen.AGE -> AgeScreen(Modifier.padding(innerPadding))
+                AppScreen.INSIGHTS -> InsightsScreen(Modifier.padding(innerPadding))
+                AppScreen.DIFFERENCE -> DifferenceScreen(Modifier.padding(innerPadding))
+                AppScreen.TOOLS -> ToolsScreen(Modifier.padding(innerPadding))
             }
         }
     }

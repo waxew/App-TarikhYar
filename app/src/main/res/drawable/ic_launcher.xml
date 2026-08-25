@@ -1,12 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="108dp"
-    android:height="108dp"
-    android:viewportWidth="108"
-    android:viewportHeight="108">
-    <path android:fillColor="#5B5CE2" android:pathData="M0,0h108v108h-108z"/>
-    <path android:fillColor="#FFFFFF" android:pathData="M27,30h54c4.4,0 8,3.6 8,8v43c0,4.4 -3.6,8 -8,8h-54c-4.4,0 -8,-3.6 -8,-8v-43c0,-4.4 3.6,-8 8,-8z"/>
-    <path android:fillColor="#B8C8FF" android:pathData="M19,43h70v10h-70z"/>
-    <path android:fillColor="#5B5CE2" android:pathData="M35,20h7v19h-7zM66,20h7v19h-7z"/>
-    <path android:fillColor="#5B5CE2" android:pathData="M54,60a13,13 0,1 0,0 26a13,13 0,1 0,0 -26z"/>
-    <path android:strokeColor="#FFFFFF" android:strokeWidth="4" android:strokeLineCap="round" android:fillColor="@android:color/transparent" android:pathData="M54,66v8l6,4"/>
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <!-- Transparent launcher artwork: calendar only, no text/cake/moon/background panel. -->
+    <path android:fillColor="#FFF4EA" android:pathData="M20,27 Q20,18 29,18 L79,18 Q88,18 88,27 L88,82 Q88,91 79,91 L29,91 Q20,91 20,82 Z"/>
+    <path android:fillColor="#F22243" android:pathData="M20,27 Q20,18 29,18 L79,18 Q88,18 88,27 L88,39 L20,39 Z"/>
+    <path android:fillColor="#FFFFFF" android:pathData="M35,12 Q39,12 39,17 L39,27 Q39,32 35,32 Q31,32 31,27 L31,17 Q31,12 35,12 M73,12 Q77,12 77,17 L77,27 Q77,32 73,32 Q69,32 69,27 L69,17 Q69,12 73,12"/>
+    <path android:fillColor="#FFD5C9" android:pathData="M29,48 L43,48 L43,61 L29,61 Z M48,48 L62,48 L62,61 L48,61 Z M67,48 L79,48 L79,61 L67,61 Z M29,67 L43,67 L43,80 L29,80 Z M48,67 L62,67 L62,80 L48,80 Z"/>
+    <path android:fillColor="#F22243" android:pathData="M69,69 C64,62 53,67 54,75 C55,82 67,87 69,89 C71,87 83,82 84,75 C85,67 74,62 69,69 Z"/>
 </vector>
