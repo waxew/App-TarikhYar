@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "ir.tarikhyar.app"
-    compileSdk = 37
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "ir.tarikhyar.app"
