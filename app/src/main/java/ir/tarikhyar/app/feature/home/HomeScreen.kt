@@ -1,6 +1,7 @@
 package ir.tarikhyar.app.feature.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,13 +16,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.CalendarMonth
-import androidx.compose.material.icons.rounded.Cake
-import androidx.compose.material.icons.rounded.CompareArrows
 import androidx.compose.material.icons.rounded.NotificationsNone
 import androidx.compose.material.icons.rounded.Settings
-import androidx.compose.material.icons.rounded.Stars
-import androidx.compose.material.icons.rounded.SwapHoriz
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -33,89 +29,149 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import ir.tarikhyar.app.AppScreen
-import ir.tarikhyar.app.BuildConfig
 import ir.tarikhyar.app.core.date.PersianCalendar
 import ir.tarikhyar.app.core.date.PersianDate
 import ir.tarikhyar.app.core.format.PersianFormat
-import ir.tarikhyar.app.ui.components.FeatureCard
-import ir.tarikhyar.app.ui.components.SoftSectionCard
+import ir.tarikhyar.app.ui.components.GraphicMenuCard
 import java.time.LocalDate
 
 @Composable
 fun HomeScreen(onNavigate: (AppScreen) -> Unit, modifier: Modifier = Modifier) {
-    val g = LocalDate.now(); val today = PersianCalendar.fromGregorian(g)
-    LazyColumn(modifier.fillMaxSize(), contentPadding = PaddingValues(18.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+    val gregorian = LocalDate.now()
+    val today = PersianCalendar.fromGregorian(gregorian)
+
+    LazyColumn(
+        modifier = modifier.fillMaxSize(),
+        contentPadding = PaddingValues(bottom = 24.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp),
+    ) {
         item {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                RoundTopIcon(Icons.Rounded.Settings)
-                Text("سلام، به تاریخ‌یار خوش اومدی!", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.primary)
-                RoundTopIcon(Icons.Rounded.NotificationsNone)
-            }
-        }
-        item { TodayHero(PersianFormat.weekday(g.dayOfWeek), PersianFormat.persianDate(today), PersianFormat.gregorian(g), dayOfYear(today), daysUntilEndOfYear(today)) }
-        item {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                FeatureCard("محاسبه سن", "سن دقیق، شمع و ساعت عمر", Icons.Rounded.Cake, { onNavigate(AppScreen.AGE) }, Modifier.weight(1f))
-                FeatureCard("اطلاعات تولد", "قمری، حیوان سال و طالع", Icons.Rounded.Stars, { onNavigate(AppScreen.INSIGHTS) }, Modifier.weight(1f))
-            }
-        }
-        item {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                FeatureCard("اختلاف تاریخ", "فاصله دقیق دو تاریخ", Icons.Rounded.CompareArrows, { onNavigate(AppScreen.DIFFERENCE) }, Modifier.weight(1f))
-                FeatureCard("تبدیل تاریخ", "شمسی و میلادی", Icons.Rounded.SwapHoriz, { onNavigate(AppScreen.TOOLS) }, Modifier.weight(1f))
-            }
-        }
-        item {
-            SoftSectionCard {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text("نسخه ${BuildConfig.VERSION_NAME}", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
-                        Text("ساده، گرافیکی و بدون تبلیغات", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                    Surface(shape = CircleShape, color = MaterialTheme.colorScheme.primaryContainer, modifier = Modifier.size(52.dp)) {
-                        Box(contentAlignment = Alignment.Center) { Icon(Icons.Rounded.CalendarMonth, null, tint = MaterialTheme.colorScheme.primary) }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(MaterialTheme.shapes.extraLarge)
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(Color(0xFFFF4861), Color(0xFFD81334))
+                        )
+                    )
+                    .padding(horizontal = 16.dp, vertical = 14.dp),
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    TopIcon(Icons.Rounded.Settings) { onNavigate(AppScreen.SETTINGS) }
+                    Text(
+                        text = "سلام! خوش اومدی 👋",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = Color.White,
+                        fontWeight = FontWeight.ExtraBold,
+                    )
+                    TopIcon(Icons.Rounded.NotificationsNone) { onNavigate(AppScreen.NOTIFICATIONS) }
+                }
+
+                Surface(
+                    modifier = Modifier.fillMaxWidth().padding(top = 58.dp),
+                    shape = MaterialTheme.shapes.large,
+                    color = Color.White,
+                    shadowElevation = 4.dp,
+                ) {
+                    Row(
+                        modifier = Modifier.padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(14.dp),
+                    ) {
+                        Surface(shape = CircleShape, color = Color(0xFFEAF9EC), modifier = Modifier.size(56.dp)) {
+                            Box(contentAlignment = Alignment.Center) { Text("🗓️", style = MaterialTheme.typography.headlineMedium) }
+                        }
+                        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                            Text(PersianFormat.weekday(gregorian.dayOfWeek), color = Color(0xFFE31F43), fontWeight = FontWeight.Bold)
+                            Text(PersianFormat.persianDate(today), style = MaterialTheme.typography.titleLarge, color = Color(0xFF182248))
+                            Text(PersianFormat.gregorian(gregorian), color = Color(0xFF58617C), style = MaterialTheme.typography.bodyMedium)
+                            Spacer(Modifier.height(5.dp))
+                            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                                HomeMetric("روز گذشته", PersianFormat.number(dayOfYear(today).toLong()), Modifier.weight(1f))
+                                HomeMetric("تا پایان سال", PersianFormat.number(daysUntilEndOfYear(today).toLong()), Modifier.weight(1f))
+                            }
+                        }
                     }
                 }
             }
         }
-        item { Spacer(Modifier.height(6.dp)) }
-    }
-}
 
-@Composable
-private fun RoundTopIcon(icon: androidx.compose.ui.graphics.vector.ImageVector) {
-    Surface(shape = CircleShape, color = MaterialTheme.colorScheme.surface, tonalElevation = 1.dp, shadowElevation = 2.dp) {
-        Box(Modifier.size(42.dp), contentAlignment = Alignment.Center) { Icon(icon, null, tint = MaterialTheme.colorScheme.primary) }
-    }
-}
+        item {
+            Text(
+                text = "ابزارهای تاریخ‌یار",
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 18.dp),
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.primary,
+                textAlign = TextAlign.Center,
+            )
+        }
 
-@Composable
-private fun TodayHero(weekday: String, date: String, gregorian: String, passed: Int, remaining: Int) {
-    Box(
-        Modifier.fillMaxWidth().clip(MaterialTheme.shapes.extraLarge)
-            .background(Brush.linearGradient(listOf(MaterialTheme.colorScheme.secondary, MaterialTheme.colorScheme.primary))).padding(20.dp)
-    ) {
-        Box(Modifier.align(Alignment.TopStart).size(96.dp).clip(CircleShape).background(Color.White.copy(.10f)))
-        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(weekday, color = Color.White.copy(.9f), style = MaterialTheme.typography.titleMedium)
-            Text(date, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.ExtraBold, color = Color.White)
-            Text(gregorian, color = Color.White.copy(.86f))
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                HeroMetric("روز سپری‌شده", PersianFormat.number(passed.toLong()), Modifier.weight(1f))
-                HeroMetric("روز تا پایان سال", PersianFormat.number(remaining.toLong()), Modifier.weight(1f))
+        item {
+            Column(modifier = Modifier.padding(horizontal = 18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    GraphicMenuCard("محاسبه سن", "🎂", { onNavigate(AppScreen.AGE) }, Modifier.weight(1f), "سن دقیق و تولد بعدی")
+                    GraphicMenuCard("اطلاعات تولد", "🌸", { onNavigate(AppScreen.BIRTH_INFO) }, Modifier.weight(1f), "شمسی، میلادی و قمری")
+                }
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    GraphicMenuCard("اختلاف تاریخ", "🗓️", { onNavigate(AppScreen.DIFFERENCE) }, Modifier.weight(1f), "فاصله دقیق دو تاریخ")
+                    GraphicMenuCard("تبدیل تاریخ", "🎁", { onNavigate(AppScreen.TOOLS) }, Modifier.weight(1f), "شمسی و میلادی")
+                }
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    GraphicMenuCard("رویدادهای سنی", "🎯", { onNavigate(AppScreen.AGE_EVENTS) }, Modifier.weight(1f), "مدرسه، ۱۸ سال و بیشتر")
+                    GraphicMenuCard("طالع‌بینی چینی", "🐭", { onNavigate(AppScreen.CHINESE) }, Modifier.weight(1f), "حیوان سال و ویژگی‌ها")
+                }
+            }
+        }
+
+        item {
+            Surface(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 18.dp),
+                shape = MaterialTheme.shapes.large,
+                color = Color(0xFFFFEEF0),
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    Text("⭐", style = MaterialTheme.typography.headlineMedium)
+                    Column {
+                        Text("بیش از ده‌ها محاسبه کاربردی", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+                        Text("محیط فارسی، سریع، ساده و قابل استفاده بدون تایپ زیاد", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
             }
         }
     }
 }
 
 @Composable
-private fun HeroMetric(title: String, value: String, modifier: Modifier = Modifier) {
-    Surface(modifier, shape = MaterialTheme.shapes.medium, color = Color.White.copy(.18f)) {
-        Column(Modifier.padding(10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(title, color = Color.White.copy(.84f), style = MaterialTheme.typography.labelMedium)
-            Text(value, color = Color.White, style = MaterialTheme.typography.titleMedium)
+private fun TopIcon(icon: androidx.compose.ui.graphics.vector.ImageVector, onClick: () -> Unit) {
+    Surface(
+        modifier = Modifier.size(42.dp).clickable(onClick = onClick),
+        shape = CircleShape,
+        color = Color.White.copy(alpha = 0.97f),
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            Icon(icon, null, tint = Color(0xFFE31F43))
+        }
+    }
+}
+
+@Composable
+private fun HomeMetric(title: String, value: String, modifier: Modifier = Modifier) {
+    Surface(modifier = modifier, shape = MaterialTheme.shapes.small, color = Color(0xFFFFF4EA)) {
+        Column(Modifier.padding(vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(title, style = MaterialTheme.typography.labelMedium, color = Color(0xFF77717A))
+            Text(value, style = MaterialTheme.typography.titleMedium, color = Color(0xFF17204A), fontWeight = FontWeight.Bold)
         }
     }
 }
