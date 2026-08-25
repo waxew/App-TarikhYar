@@ -1,4 +1,4 @@
-name: Build TarikhYar
+name: Validate TarikhYar V1.5 Install
 
 on:
   push:
@@ -7,11 +7,12 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
-  build:
+  build-and-install:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
 
     steps:
       - name: Checkout
@@ -40,12 +41,62 @@ jobs:
       - name: Build unsigned release APK
         run: gradle assembleRelease --stacktrace
 
-      # Public CI deliberately does not contain or generate the permanent release key.
-      # Public APK/AAB releases must be signed with the backed-up TarikhYar 1.4 key.
-      - name: Upload unsigned CI APK
+      - name: Download established TarikhYar signing key artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: TarikhYar-v1.4-signing-key-backup
+          run-id: 32902118666
+          github-token: ${{ github.token }}
+          path: signing-key-artifact
+
+      - name: Sign V1.5 release with permanent key and 16KB alignment
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p signing-material signing-output
+          unzip -q signing-key-artifact/TarikhYar-signing-key-backup-v1.4.zip -d signing-material
+          STORE_PASS="$(sed -n 's/^Store password: //p' signing-material/KEEP-SAFE.txt)"
+          KEY_ALIAS="$(sed -n 's/^Alias: //p' signing-material/KEEP-SAFE.txt)"
+          UNSIGNED="app/build/outputs/apk/release/app-release-unsigned.apk"
+          ALIGNED="signing-output/TarikhYar-v1.5.0-aligned.apk"
+          SIGNED="signing-output/TarikhYar-v1.5.0-release.apk"
+          "$ANDROID_HOME/build-tools/35.0.0/zipalign" -P 16 -f -v 4 "$UNSIGNED" "$ALIGNED"
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" sign \
+            --ks signing-material/TarikhYar-release.jks \
+            --ks-key-alias "$KEY_ALIAS" \
+            --ks-pass "pass:$STORE_PASS" \
+            --key-pass "pass:$STORE_PASS" \
+            --v1-signing-enabled true \
+            --v2-signing-enabled true \
+            --v3-signing-enabled true \
+            --out "$SIGNED" \
+            "$ALIGNED"
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs "$SIGNED"
+          "$ANDROID_HOME/build-tools/35.0.0/zipalign" -c -P 16 -v 4 "$SIGNED"
+          rm -f "$ALIGNED"
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Install APK on Android emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          profile: pixel_6
+          disable-animations: true
+          script: |
+            adb install -r signing-output/TarikhYar-v1.5.0-release.apk
+            adb shell pm path ir.tarikhyar.app
+            adb shell dumpsys package ir.tarikhyar.app | grep -E 'versionCode|versionName' | head -n 4
+
+      - name: Upload verified signed APK
         uses: actions/upload-artifact@v4
         with:
-          name: TarikhYar-ci-unsigned-release
-          path: app/build/outputs/apk/release/app-release-unsigned.apk
+          name: TarikhYar-v1.5.0-install-verified
+          path: signing-output/TarikhYar-v1.5.0-release.apk
           if-no-files-found: error
           retention-days: 7
