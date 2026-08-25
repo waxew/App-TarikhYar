@@ -50,7 +50,9 @@ android {
 }
 
 dependencies {
-    val composeBom = platform("androidx.compose:compose-bom:2026.08.00")
+    // Compose 1.11 is the latest stable Compose line that remains compatible
+    // with the API 36 / AGP 8.13 toolchain used by TarikhYar V1.
+    val composeBom = platform("androidx.compose:compose-bom:2026.04.01")
 
     implementation(composeBom)
     androidTestImplementation(composeBom)
