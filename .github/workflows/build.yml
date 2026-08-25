@@ -1,4 +1,4 @@
-name: Build TarikhYar V1.4 Signed
+name: Build TarikhYar
 
 on:
   push:
@@ -40,75 +40,14 @@ jobs:
       - name: Build unsigned release APK
         run: gradle assembleRelease --stacktrace
 
-      - name: Generate one-time permanent release key and sign with v1/v2/v3
-        shell: bash
-        run: |
-          set -euo pipefail
-          OUT="$GITHUB_WORKSPACE/signing-output"
-          mkdir -p "$OUT"
-          STORE_PASS="$(openssl rand -hex 24)"
-          KEY_ALIAS="tarikhyar"
-          KEYSTORE="$OUT/TarikhYar-release.jks"
-          UNSIGNED="$GITHUB_WORKSPACE/app/build/outputs/apk/release/app-release-unsigned.apk"
-          ALIGNED="$OUT/TarikhYar-v1.4.0-aligned.apk"
-          SIGNED="$OUT/TarikhYar-v1.4.0-release.apk"
-
-          keytool -genkeypair -v \
-            -keystore "$KEYSTORE" \
-            -alias "$KEY_ALIAS" \
-            -keyalg RSA \
-            -keysize 4096 \
-            -validity 10000 \
-            -storepass "$STORE_PASS" \
-            -keypass "$STORE_PASS" \
-            -dname "CN=TarikhYar, OU=Android, O=TarikhYar, L=Unknown, ST=Unknown, C=IR"
-
-          "$ANDROID_HOME/build-tools/35.0.0/zipalign" -f -p 4 "$UNSIGNED" "$ALIGNED"
-
-          "$ANDROID_HOME/build-tools/35.0.0/apksigner" sign \
-            --ks "$KEYSTORE" \
-            --ks-key-alias "$KEY_ALIAS" \
-            --ks-pass "pass:$STORE_PASS" \
-            --key-pass "pass:$STORE_PASS" \
-            --v1-signing-enabled true \
-            --v2-signing-enabled true \
-            --v3-signing-enabled true \
-            --out "$SIGNED" \
-            "$ALIGNED"
-
-          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs "$SIGNED"
-          "$ANDROID_HOME/build-tools/35.0.0/zipalign" -c -v 4 "$SIGNED"
-
-          cat > "$OUT/KEEP-SAFE.txt" <<EOF
-          TarikhYar permanent release signing key
-          =====================================
-          Keystore file: TarikhYar-release.jks
-          Alias: $KEY_ALIAS
-          Store password: $STORE_PASS
-          Key password: $STORE_PASS
-
-          IMPORTANT:
-          - Keep this backup private and offline.
-          - Do not commit it to a public repository.
-          - All future TarikhYar APK/AAB updates must use this same key.
-          EOF
-
-          cd "$OUT"
-          zip -q TarikhYar-signing-key-backup-v1.4.zip TarikhYar-release.jks KEEP-SAFE.txt
-          rm -f "$ALIGNED"
-
-      - name: Upload signed APK
+      # Release signing is intentionally NOT performed with a newly generated key here.
+      # TarikhYar 1.4 established the permanent release certificate. All future public
+      # APK/AAB files must be signed with that exact backed-up key (or the same key
+      # provisioned securely through CI secrets). Rotating the key would break updates.
+      - name: Upload unsigned CI APK
         uses: actions/upload-artifact@v4
         with:
-          name: TarikhYar-v1.4.0-release-signed
-          path: signing-output/TarikhYar-v1.4.0-release.apk
+          name: TarikhYar-ci-unsigned-release
+          path: app/build/outputs/apk/release/app-release-unsigned.apk
           if-no-files-found: error
-          retention-days: 2
-
-      - name: Upload signing key backup
-        uses: actions/upload-artifact@v4
-        with:
-          name: TarikhYar-v1.4-signing-key-backup
-          path: signing-output/TarikhYar-signing-key-backup-v1.4.zip
-          if-no-files-found: error
-          retention-days: 2
+          retention-days: 7
