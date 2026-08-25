@@ -111,7 +111,7 @@ private fun AgeResultContent(birth: PersianDate, today: PersianDate, result: Dat
 }
 
 @Composable
-private fun BigAgeNumber(label: String, value: Int) {
+private fun BigAgeNumber(label: String, value: Any) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(PersianFormat.digits(value), style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.primary)
         Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant)
