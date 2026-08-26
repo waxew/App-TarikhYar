@@ -1,192 +1,49 @@
-# این Workflow موقت نسخه 1.6 را تست، امضا، نصب آزمایشی و برای تحویل بسته‌بندی می‌کند.
-name: Publish TarikhYar 1.6
+# این Workflow امن فقط سلامت سورس تاریخ‌یار را تست می‌کند و به هیچ کلید امضا یا رمز انتشار دسترسی ندارد.
+name: Validate TarikhYar Build
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
 
-# write فقط برای Commit یک‌باره کامنت‌های آموزشی سورس لازم است؛ پس از انتشار دوباره به read برگردانده می‌شود.
 permissions:
-  contents: write
-  actions: read
+  contents: read
 
 jobs:
-  build-sign-test-package:
+  build:
     runs-on: ubuntu-latest
-    timeout-minutes: 50
+    timeout-minutes: 35
 
     steps:
-      # سورس Commit فعلی را روی Runner دریافت می‌کند.
+      # آخرین سورس main را برای تست دریافت می‌کند.
       - name: Checkout
         uses: actions/checkout@v4
 
-      # استاندارد کامنت‌گذاری AS Team را روی تمام Kotlin/KTSهای فاقد Marker اعمال می‌کند.
-      - name: Apply educational source comments
-        run: python3 tools/apply_source_comments.py
-
-      # اگر کامنت جدیدی اضافه شده باشد، همان سورس توضیح‌دار به main برگردانده می‌شود.
-      - name: Persist source comments
-        shell: bash
-        run: |
-          set -euo pipefail
-          if ! git diff --quiet; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add '*.kt' '*.kts'
-            git commit -m "Apply AS Team source comments [commented]"
-            git push origin HEAD:main
-          fi
-
-      # پروژه با Java 17 کامپایل می‌شود.
+      # پروژه با Java 17 ساخته می‌شود.
       - name: Set up JDK 17
         uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "17"
 
-      # Android SDK و ابزار خط فرمان را برای Build و Emulator آماده می‌کند.
+      # Android SDK مورد نیاز Gradle را آماده می‌کند.
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      # compileSdk 36 و build-tools مورد استفاده برای zipalign/apksigner نصب می‌شوند.
+      # Platform و Build Tools مطابق تنظیمات برنامه نصب می‌شوند.
       - name: Install Android platform and build tools
         run: sdkmanager --install "platforms;android-36" "build-tools;35.0.0"
 
-      # همان Gradle نسخه مستندشده پروژه در CI استفاده می‌شود.
+      # Gradle ثابت CI برای تکرارپذیر بودن Build آماده می‌شود.
       - name: Set up Gradle 8.13
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: "8.13"
 
-      # Unit Testهای موتور تاریخ قبل از تولید APK اجرا می‌شوند.
+      # تست‌های منطقی پیش از Build اجرا می‌شوند.
       - name: Run unit tests
         run: gradle testDebugUnitTest --stacktrace
 
-      # APK Release بدون Debug flag تولید می‌شود؛ امضا در مرحله بعد انجام خواهد شد.
-      - name: Build release APK
+      # Release غیرقابل Debug کامپایل می‌شود؛ این CI عمومی هیچ Signing Key دریافت نمی‌کند.
+      - name: Build release
         run: gradle assembleRelease --stacktrace
-
-      # کلید ثابت قبلی فقط در Runner موقت دریافت می‌شود و هرگز داخل سورس ZIP کپی نمی‌شود.
-      - name: Download established TarikhYar signing material
-        uses: actions/download-artifact@v4
-        with:
-          name: TarikhYar-v1.4-signing-key-backup
-          run-id: 32902118666
-          github-token: ${{ github.token }}
-          path: signing-key-artifact
-
-      # APK با همان Certificate نسخه‌های قبلی امضا می‌شود تا Update روی نصب موجود ممکن باشد.
-      - name: Sign and verify publish APK
-        id: sign
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p signing-material signing-output dist
-          unzip -q signing-key-artifact/TarikhYar-signing-key-backup-v1.4.zip -d signing-material
-          STORE_PASS="$(sed -n 's/^Store password: //p' signing-material/KEEP-SAFE.txt)"
-          KEY_ALIAS="$(sed -n 's/^Alias: //p' signing-material/KEEP-SAFE.txt)"
-          UNSIGNED="app/build/outputs/apk/release/app-release-unsigned.apk"
-          ALIGNED="signing-output/TarikhYar-1.6.0-aligned.apk"
-          SIGNED="signing-output/TarikhYar-1.6.0.apk"
-          "$ANDROID_HOME/build-tools/35.0.0/zipalign" -P 16 -f -v 4 "$UNSIGNED" "$ALIGNED"
-          "$ANDROID_HOME/build-tools/35.0.0/apksigner" sign \
-            --ks signing-material/TarikhYar-release.jks \
-            --ks-key-alias "$KEY_ALIAS" \
-            --ks-pass "pass:$STORE_PASS" \
-            --key-pass "pass:$STORE_PASS" \
-            --v1-signing-enabled true \
-            --v2-signing-enabled true \
-            --v3-signing-enabled true \
-            --out "$SIGNED" \
-            "$ALIGNED"
-          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs "$SIGNED"
-          "$ANDROID_HOME/build-tools/35.0.0/zipalign" -c -P 16 -v 4 "$SIGNED"
-          rm -f "$ALIGNED"
-          cp "$SIGNED" dist/TarikhYar-1.6.0.apk
-          APK_SHA="$(sha256sum "$SIGNED" | awk '{print $1}')"
-          echo "apk_sha=$APK_SHA" >> "$GITHUB_OUTPUT"
-          echo "key_alias=$KEY_ALIAS" >> "$GITHUB_OUTPUT"
-
-      # KVM برای اجرای سریع Emulator روی Runner لینوکسی فعال می‌شود.
-      - name: Enable KVM
-        run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
-
-      # نصب واقعی APK Release روی Emulator بررسی می‌کند فایل خروجی قابل نصب است و نسخه درست گزارش می‌شود.
-      - name: Install publish APK on Android emulator
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 35
-          arch: x86_64
-          profile: pixel_6
-          disable-animations: true
-          script: |
-            adb install -r dist/TarikhYar-1.6.0.apk
-            adb shell pm path ir.tarikhyar.app
-            adb shell dumpsys package ir.tarikhyar.app | grep -E 'versionCode|versionName' | head -n 4
-
-      # سورس قابل باز شدن در لپ‌تاپ ساخته می‌شود و هیچ فایل کلید خصوصی یا رمز Signing داخل آن قرار نمی‌گیرد.
-      - name: Package source ZIP with safe info.txt
-        shell: bash
-        env:
-          APK_SHA: ${{ steps.sign.outputs.apk_sha }}
-          KEY_ALIAS: ${{ steps.sign.outputs.key_alias }}
-        run: |
-          set -euo pipefail
-          mkdir -p dist/source/TarikhYar-1.6.0
-          rsync -a ./ dist/source/TarikhYar-1.6.0/ \
-            --exclude '.git' \
-            --exclude '.gradle' \
-            --exclude '.idea' \
-            --exclude 'app/build' \
-            --exclude 'build' \
-            --exclude 'dist' \
-            --exclude 'signing-material' \
-            --exclude 'signing-key-artifact' \
-            --exclude 'signing-output'
-          cat > dist/source/TarikhYar-1.6.0/info.txt <<EOF
-          TarikhYar - Release information
-          =================================
-          App name: TarikhYar / تاریخ‌یار
-          Version name: 1.6.0
-          Version code: 16
-          Application ID: ir.tarikhyar.app
-          Min SDK: 26
-          Target SDK: 36
-          Compile SDK: 36
-          Language/UI: Kotlin + Jetpack Compose Material 3
-          Java: 17
-          CI Gradle: 8.13
-
-          Release signing certificate
-          ---------------------------
-          Key alias: ${KEY_ALIAS}
-          Algorithm: RSA 4096-bit
-          Certificate SHA-256: dac041907d627e250aae55d7f90ba65877e0f145ccba556ba126ac8e84c3ba38
-          Certificate SHA-1: f402393fc682ade6e66b92e4bd9c8c6b3e127066
-          Certificate MD5: b9a79312320dff5d76ae26ca5c862b4b
-          Publish APK SHA-256: ${APK_SHA}
-
-          IMPORTANT SECURITY NOTE
-          -----------------------
-          The private signing keystore and its passwords are intentionally NOT included in this ZIP.
-          Keep the original TarikhYar release keystore in a private backup. Future updates must be signed
-          with the same certificate above or Android will reject installation over the existing app.
-
-          Repository: https://github.com/waxew/App-TarikhYar
-          EOF
-          (cd dist/source && zip -qr ../TarikhYar-1.6.0-source.zip TarikhYar-1.6.0)
-
-      # هر دو فایل نهایی با نام Publish و بدون واژه debug به Artifact منتقل می‌شوند.
-      - name: Upload publish files
-        uses: actions/upload-artifact@v4
-        with:
-          name: TarikhYar-1.6.0-publish
-          path: |
-            dist/TarikhYar-1.6.0.apk
-            dist/TarikhYar-1.6.0-source.zip
-          if-no-files-found: error
-          retention-days: 7
