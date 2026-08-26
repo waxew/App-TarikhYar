@@ -1,3 +1,4 @@
+// این فایل صفحه تنظیمات تاریخ‌یار را پیاده‌سازی می‌کند و فقط گزینه‌های قابل تنظیم را نمایش می‌دهد.
 package ir.tarikhyar.app.feature.settings
 
 import android.Manifest
@@ -36,28 +37,48 @@ import ir.tarikhyar.app.ui.components.shareText
 
 @Composable
 fun SettingsScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
+    // Context برای دسترسی به SharedPreferences، اعلان‌ها و Share لازم است.
     val context = LocalContext.current
-    var notifications by remember { mutableStateOf(AppPreferences.notificationsEnabled(context)) }
-    var updateStatus by remember { mutableStateOf("برای بررسی نسخه جدید، دکمه زیر را بزن.") }
 
-    val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+    // وضعیت Switch اعلان از تنظیمات ذخیره‌شده کاربر خوانده می‌شود.
+    var notifications by remember {
+        mutableStateOf(AppPreferences.notificationsEnabled(context))
+    }
+
+    // متن وضعیت بروزرسانی بعد از هر بررسی تغییر می‌کند.
+    var updateStatus by remember {
+        mutableStateOf("برای بررسی نسخه جدید، دکمه زیر را بزن.")
+    }
+
+    // در Android 13 به بالا باید مجوز POST_NOTIFICATIONS در زمان اجرا درخواست شود.
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
         notifications = granted
         AppPreferences.setNotificationsEnabled(context, granted)
-        if (granted) NotificationHelper.showTest(context)
+        if (granted) {
+            NotificationHelper.showTest(context)
+        }
     }
 
     Column(modifier.fillMaxSize()) {
         AppTopBar("تنظیمات", onBack) {
             shareText(context, "تاریخ‌یار", "تاریخ‌یار نسخه ${BuildConfig.VERSION_NAME}")
         }
+
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(18.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             item {
+                // کارت اعلان‌ها وظیفه روشن/خاموش کردن اعلان و تست مجوز را دارد.
                 ResultCard {
-                    Text("اعلان‌ها", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.primary)
+                    Text(
+                        "اعلان‌ها",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
@@ -65,7 +86,10 @@ fun SettingsScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text("اعلان نسخه جدید", fontWeight = FontWeight.Bold)
-                            Text("وقتی نسخه جدید منتشر شود، تاریخ‌یار می‌تواند به شما اطلاع بدهد.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(
+                                "وقتی نسخه جدید منتشر شود، تاریخ‌یار می‌تواند به شما اطلاع بدهد.",
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
                         }
                         Switch(
                             checked = notifications,
@@ -73,7 +97,10 @@ fun SettingsScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
                                 if (!enabled) {
                                     notifications = false
                                     AppPreferences.setNotificationsEnabled(context, false)
-                                } else if (Build.VERSION.SDK_INT >= 33 && !NotificationHelper.canNotify(context)) {
+                                } else if (
+                                    Build.VERSION.SDK_INT >= 33 &&
+                                    !NotificationHelper.canNotify(context)
+                                ) {
                                     permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                                 } else {
                                     notifications = true
@@ -83,8 +110,12 @@ fun SettingsScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
                             },
                         )
                     }
+
                     PrimaryButton("ارسال اعلان آزمایشی") {
-                        if (Build.VERSION.SDK_INT >= 33 && !NotificationHelper.canNotify(context)) {
+                        if (
+                            Build.VERSION.SDK_INT >= 33 &&
+                            !NotificationHelper.canNotify(context)
+                        ) {
                             permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                         } else {
                             AppPreferences.setNotificationsEnabled(context, true)
@@ -96,15 +127,22 @@ fun SettingsScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
             }
 
             item {
+                // کارت بروزرسانی نسخه فعلی را با version.json مخزن مقایسه می‌کند.
                 ResultCard {
-                    Text("بررسی بروزرسانی", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.primary)
+                    Text(
+                        "بررسی بروزرسانی",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
                     Text(updateStatus, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     PrimaryButton("بررسی آخرین نسخه") {
                         updateStatus = "در حال بررسی..."
                         UpdateChecker.checkAsync(context) { info ->
                             updateStatus = when {
                                 info == null -> "ارتباط با سرویس بروزرسانی برقرار نشد."
-                                info.versionCode > BuildConfig.VERSION_CODE -> "نسخه ${info.versionName} منتشر شده است. ${info.message}"
+                                info.versionCode > BuildConfig.VERSION_CODE -> {
+                                    "نسخه ${info.versionName} منتشر شده است. ${info.message}"
+                                }
                                 else -> "نسخه ${BuildConfig.VERSION_NAME} آخرین نسخه است."
                             }
                         }
@@ -113,22 +151,19 @@ fun SettingsScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
             }
 
             item {
+                // درباره نرم افزار در Drawer صفحه مستقل دارد؛ این متن کاربر را به همان بخش راهنمایی می‌کند.
                 ResultCard {
-                    Text("درباره برنامه", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.primary)
-                    SettingLine("نسخه برنامه", BuildConfig.VERSION_NAME)
-                    SettingLine("کد نسخه", BuildConfig.VERSION_CODE.toString())
-                    SettingLine("نام بسته", "ir.tarikhyar.app")
-                    SettingLine("زبان", "فارسی / راست‌چین")
+                    Text(
+                        "اطلاعات برنامه",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                    Text(
+                        "توضیحات برنامه و شماره نسخه از بخش «درباره نرم افزار» در منوی همبرگری قابل مشاهده است.",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun SettingLine(label: String, value: String) {
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Text(value, fontWeight = FontWeight.Bold)
     }
 }

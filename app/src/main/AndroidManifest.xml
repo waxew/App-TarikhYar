@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- این Manifest مجوزها و Activity اصلی برنامه تاریخ‌یار را به سیستم‌عامل معرفی می‌کند. -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- اینترنت فقط برای بررسی version.json و اطلاع از بروزرسانی استفاده می‌شود. -->
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Android 13 به بالا برای نمایش اعلان نیاز به این مجوز زمان اجرا دارد. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <!-- تنظیمات عمومی اپلیکیشن شامل آیکن، نام، RTL و Theme در این بخش قرار دارد. -->
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -10,11 +15,16 @@
         android:roundIcon="@drawable/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/Theme.TarikhYar">
+
+        <!-- MainActivity نقطه ورود برنامه است و از Launcher قابل اجراست. -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
+                <!-- این Action مشخص می‌کند MainActivity ورودی اصلی برنامه است. -->
                 <action android:name="android.intent.action.MAIN" />
+
+                <!-- این Category باعث نمایش آیکن تاریخ‌یار در Launcher دستگاه می‌شود. -->
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

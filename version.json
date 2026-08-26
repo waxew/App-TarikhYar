@@ -1,6 +1,6 @@
 {
-  "latestVersionCode": 15,
-  "latestVersionName": "1.5.0",
-  "message": "نسخه 1.5 تاریخ‌یار با طراحی جدید، رویدادهای سنی، طالع چینی، تنظیمات و اعلان‌ها منتشر شد.",
-  "downloadUrl": "https://cafebazaar.ir/"
+  "latestVersionCode": 16,
+  "latestVersionName": "1.6.0",
+  "message": "منوی همبرگری، بازگشت صحیح بین صفحات، صفحات درباره ما/تماس/درباره نرم افزار، بهبود اعلان و رفع باگ‌های نسخه 1.6 اضافه شد.",
+  "downloadUrl": "https://github.com/waxew/App-TarikhYar/releases/latest"
 }
