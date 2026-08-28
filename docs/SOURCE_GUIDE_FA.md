@@ -1,74 +1,62 @@
-# راهنمای سورس تاریخ‌یار
+# راهنمای سورس تاریخ‌یار 2.0
 
-این سند مکمل کامنت‌های داخل سورس است و توضیح می‌دهد هر فایل اصلی پروژه چه مسئولیتی دارد.
+این سند مکمل کامنت‌های داخل سورس است و مسئولیت فایل‌های مهم نسخه 2.0 را توضیح می‌دهد.
 
 ## قانون کامنت‌گذاری AS Team
-- هر فایل سورس باید در ابتدای فایل توضیح مسئولیت داشته باشد.
-- قبل از منطق‌های مهم، Stateها، شرط‌ها، حلقه‌ها، callbackها و بخش‌های UI باید توضیح فارسی نوشته شود.
-- هدف کامنت توضیح «چرا این کد وجود دارد و چه کاری انجام می‌دهد» است، نه تکرار بی‌فایده همان دستور.
-- فایل `tools/apply_source_comments.py` برای نسخه 1.6 روی همه فایل‌های Kotlin/KTS اجرا می‌شود و توضیح آموزشی خط‌به‌خط اضافه می‌کند.
-- JSON استاندارد اجازه Comment ندارد؛ بنابراین فایل `version.json` در README و همین سند توضیح داده شده است.
+- فایل‌های Kotlin و Kotlin Script باید توضیح مسئولیت و راهنمای منطق داشته باشند.
+- `tools/apply_source_comments.py` استاندارد آموزشی خط‌به‌خط را به‌صورت idempotent روی `.kt` و `.kts` اعمال می‌کند.
+- CI نسخه 2.0 همین اسکریپت را قبل از Unit Test و Build اجرا می‌کند؛ بنابراین سورس کامنت‌گذاری‌شده نیز قابل Build کنترل می‌شود.
+- JSON و XML در محل‌هایی که استاندارد فایل Comment را محدود می‌کند بدون Comment مخرب نگهداری می‌شوند و توضیحشان در مستندات قرار می‌گیرد.
 
-## فایل‌های ریشه
-- `settings.gradle.kts`: نام پروژه و Repositoryهای Gradle را مشخص می‌کند.
-- `build.gradle.kts`: نسخه Pluginهای Android/Kotlin را در سطح پروژه تعریف می‌کند.
-- `gradle.properties`: تنظیمات عمومی Gradle و AndroidX.
-- `version.json`: نسخه آخر قابل انتشار برای UpdateChecker.
-- `.github/workflows/build.yml`: تست و Build خودکار پروژه.
-- `README.md`: معرفی قابلیت‌ها، ساختار و روش انتشار.
+## ریشه پروژه
+- `VERSION.txt`: نسخه رسمی پروژه.
+- `version.json`: متادیتای Update Checker.
+- `README.md`: معرفی نسخه و امکانات.
+- `info.txt`: اطلاعات فنی عمومی پروژه؛ اطلاعات خصوصی Signing فقط در بسته خصوصی مالک قرار می‌گیرد.
+- `.github/workflows/build.yml`: اعمال کامنت‌ها، Unit Test، Release Build و Artifact بدون امضا.
+- `tools/apply_source_comments.py`: استاندارد کامنت‌گذاری AS Team.
 
-## ماژول app
-- `app/build.gradle.kts`: SDKها، versionCode/versionName، Build Typeها و Dependencyها.
-- `app/proguard-rules.pro`: قوانین R8/ProGuard نسخه Release.
-- `app/src/main/AndroidManifest.xml`: Permissionها، Application و MainActivity.
+## ماژول Android
+- `app/build.gradle.kts`: SDK، Application ID، versionCode/versionName و Dependencyها.
+- `AndroidManifest.xml`: Permissionها، Activity، Receiverها، FileProvider و AppWidget.
+- `MainActivity.kt`: راه‌اندازی Channel اعلان، Reminderها، Update Checker و Theme.
+- `TarikhYarApp.kt`: Drawer، Bottom Navigation، مقصدها و Back Stack واقعی.
 
-## هسته برنامه
-- `MainActivity.kt`: نقطه ورود Android، ساخت Notification Channel، بررسی بروزرسانی و راه‌اندازی Compose.
-- `TarikhYarApp.kt`: پوسته اصلی، صفحه فعلی، Back Stack، Drawer و اتصال Screenها.
+## هسته تاریخ و داده
+- `core/date/PersianCalendar.kt`: محاسبات و تبدیل تقویم شمسی.
+- `core/date/DateCalculations.kt`: سن و اختلاف تاریخ.
+- `core/date/BirthInsights.kt`: اطلاعات تولد و داده‌های فرهنگی/سرگرمی.
+- `core/data/LocalData.kt`: پروفایل‌ها، مناسبت‌های شخصی، Favorites و مناسبت‌های ثابت خورشیدی.
+- `core/format/PersianFormat.kt`: نمایش اعداد و تاریخ فارسی.
 
-### core/date
-- `PersianDate.kt`: مدل ساده تاریخ شمسی.
-- `PersianCalendar.kt`: تبدیل و محاسبات تقویم جلالی.
-- `DateCalculations.kt`: محاسبه اختلاف سن و فاصله تاریخ‌ها.
-- `BirthInsights.kt`: داده‌ها و محاسبات مرتبط با تولد و محتوای فرهنگی/سرگرمی.
+## سرویس‌های سیستم
+- `core/system/AppServices.kt`: اعلان و بررسی نسخه جدید.
+- `core/system/UserSettings.kt`: تم، رنگ، اندازه متن، قالب کارت و تنظیمات اعلان.
+- `core/system/ReminderScheduler.kt`: Alarmهای تولد، مناسبت و رویدادهای سنی و بازسازی پس از Boot.
+- `core/system/BackupManager.kt`: Backup رمزگذاری‌شده با PBKDF2 + AES-256-GCM.
+- `core/system/ShareCardRenderer.kt`: ساخت کارت PNG برای Share.
 
-### core/format
-- `PersianFormat.kt`: تبدیل ارقام و قالب‌بندی نمایش تاریخ و عدد فارسی.
+## قابلیت‌های رابط
+- `feature/home`: داشبورد و میانبرهای اصلی.
+- `feature/age`: محاسبه سن و کارت خروجی.
+- `feature/birthinfo`: اطلاعات تولد شمسی/میلادی/قمری.
+- `feature/calendar`: تقویم ماهانه، تعطیلات ثابت و رویدادها.
+- `feature/profiles`: چند پروفایل خانواده/دوستان.
+- `feature/personalevents`: CRUD و جست‌وجوی مناسبت‌های شخصی.
+- `feature/protools`: روز کاری، Date Math، سن در تاریخ دلخواه، مقایسه و Countdown.
+- `feature/favorites`: ابزارها و پروفایل‌های منتخب.
+- `feature/backup`: خروجی/بازیابی Backup و انتقال اختیاری بین دستگاه‌ها.
+- `feature/settings`: ظاهر، اعلان‌ها، کارت‌ها و Update Checker.
+- `feature/chinese` و `feature/events`: طالع چینی و رویدادهای سنی.
+- `ui/components/PersianDatePicker.kt`: انتخاب تاریخ شمسی بدون تایپ.
+- `ui/components/AppDrawer.kt`: منوی همبرگری جدید، پروفایل و تصویر کاربر.
+- `widget/TarikhYarWidgetProvider.kt`: ویجت تاریخ امروز و نزدیک‌ترین تولد.
 
-### core/system
-- `AppServices.kt`: SharedPreferences، Notification و UpdateChecker.
+## Resourceها
+- `res/layout/widget_tarikhyar.xml`: Layout ویجت.
+- `res/xml/tarikhyar_widget_info.xml`: مشخصات AppWidget.
+- `res/xml/file_paths.xml`: مسیر امن Share کارت تصویری.
+- `res/drawable/ic_launcher.xml`: آیکن برنامه.
 
-### core/ui/theme
-- `Color.kt`: پالت رنگی تاریخ‌یار.
-- `Theme.kt`: Material 3 Theme، Typography و Shapeها.
-
-## Featureها
-- `feature/home/HomeScreen.kt`: داشبورد، منوی همبرگری و کارت‌های ورود به ابزارها.
-- `feature/age/AgeScreen.kt`: ورود تاریخ تولد و نمایش محاسبات کامل سن.
-- `feature/birthinfo/BirthInfoScreen.kt`: اطلاعات شمسی/میلادی/قمری تولد.
-- `feature/chinese/ChineseAstrologyScreen.kt`: حیوان سال و محتوای فرهنگی چینی.
-- `feature/difference/DifferenceScreen.kt`: اختلاف دو تاریخ.
-- `feature/events/AgeEventsScreen.kt`: نقاط عطف و رویدادهای سنی.
-- `feature/insights/InsightsScreen.kt`: اطلاعات تکمیلی و Insightهای تولد.
-- `feature/tools/ToolsScreen.kt`: ابزارهای تبدیل و محاسبات تاریخ.
-- `feature/settings/SettingsScreen.kt`: تنظیم اعلان و بررسی بروزرسانی.
-- `feature/notifications/NotificationsScreen.kt`: مرکز اعلان‌ها.
-- `feature/about/AboutScreens.kt`: درباره ما، تماس با ما و درباره نرم افزار.
-
-## UI مشترک
-- `ui/components/CommonComponents.kt`: AppBar، Cardها، DateFields، Buttonها و Share helper.
-- `ui/components/AppDrawer.kt`: محتوای Drawer و گزینه‌های نوار همبرگری.
-
-## تست‌ها و ابزار توسعه
-- `app/src/test/.../PersianCalendarTest.kt`: تست‌های موتور تقویم.
-- `tools/CoreSmokeTest.kt`: Smoke Test ساده برای منطق اصلی.
-- `tools/apply_source_comments.py`: اعمال استاندارد توضیحات خط‌به‌خط روی Kotlin/KTS.
-
-## فایل‌های Resource
-- `res/drawable/ic_launcher.xml`: آیکن برداری برنامه.
-- `res/values/strings.xml`: نام برنامه و String Resourceهای XML.
-- `res/values/themes.xml`: Theme سطح Android برای حالت روشن.
-- `res/values-night/themes.xml`: Theme سطح Android برای حالت شب.
-
-## نکته امنیتی امضا
-کلید خصوصی Signing و رمز آن بخشی از سورس نیستند و نباید به GitHub عمومی یا ZIP سورس اضافه شوند. برای شناسایی کلید درست، Fingerprint گواهی Release در `info.txt` بسته تحویلی ثبت می‌شود.
+## Signing
+Repository عمومی هیچ JKS یا Password خصوصی ندارد. بسته خصوصی کامل تحویلی به مالک پروژه شامل `private-signing/TarikhYar-release.jks` و راهنمای رمزهاست. این بخش نباید دوباره به GitHub عمومی Commit شود.
