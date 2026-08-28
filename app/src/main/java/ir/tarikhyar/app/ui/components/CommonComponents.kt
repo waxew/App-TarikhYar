@@ -44,17 +44,10 @@ import androidx.compose.ui.unit.sp
 import ir.tarikhyar.app.core.date.PersianCalendar
 import ir.tarikhyar.app.core.date.PersianDate
 
-/** نوار بالای صفحات Back و Share را مدیریت می‌کند؛ Share پیش‌فرض معرفی خود برنامه است. */
 @Composable
 fun AppTopBar(title: String, onBack: () -> Unit, onShare: (() -> Unit)? = null) {
     val context = LocalContext.current
-    val shareAction = onShare ?: {
-        shareText(
-            context,
-            title,
-            "تاریخ‌یار؛ تقویم زندگی، محاسبه سن و ابزارهای تاریخ\nhttps://github.com/waxew/App-TarikhYar",
-        )
-    }
+    val shareAction = onShare ?: { shareText(context, title, "تاریخ‌یار؛ تقویم زندگی، محاسبه سن و ابزارهای تاریخ\nhttps://github.com/waxew/App-TarikhYar") }
     Surface(
         modifier = Modifier.fillMaxWidth(),
         color = MaterialTheme.colorScheme.surface,
@@ -145,27 +138,20 @@ fun FeatureCard(title: String, subtitle: String, icon: ImageVector, onClick: () 
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Box(
-                Modifier.size(46.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primaryContainer),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(icon, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Box(Modifier.size(50.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primaryContainer), contentAlignment = Alignment.Center) {
+                Icon(icon, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(27.dp))
             }
-            Text(title, style = MaterialTheme.typography.titleMedium)
-            Text(subtitle, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(title, style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center)
+            Text(subtitle, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
         }
     }
 }
 
 @Composable
 fun DateFields(
-    year: String,
-    month: String,
-    day: String,
-    onYearChange: (String) -> Unit,
-    onMonthChange: (String) -> Unit,
-    onDayChange: (String) -> Unit,
+    year: String, month: String, day: String,
+    onYearChange: (String) -> Unit, onMonthChange: (String) -> Unit, onDayChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -183,17 +169,15 @@ private fun NumericDateField(value: String, onValueChange: (String) -> Unit, lab
             val normalized = raw.mapNotNull { it.toLatinDigitOrNull() }.joinToString("")
             if (normalized.length <= maxLength) onValueChange(normalized)
         },
-        label = { Text(label) },
-        singleLine = true,
+        label = { Text(label) }, singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         textStyle = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.Center),
-        modifier = modifier,
-        shape = MaterialTheme.shapes.medium,
+        modifier = modifier, shape = MaterialTheme.shapes.medium,
     )
 }
 
 @Composable
-fun PrimaryButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun PrimaryButton(text: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
     Button(
         onClick = onClick,
         modifier = modifier.fillMaxWidth().height(54.dp),
@@ -203,7 +187,7 @@ fun PrimaryButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifi
 }
 
 @Composable
-fun GradientHeroButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun GradientHeroButton(text: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
     Button(
         onClick = onClick,
         modifier = modifier.fillMaxWidth().height(56.dp),
@@ -212,7 +196,7 @@ fun GradientHeroButton(text: String, onClick: () -> Unit, modifier: Modifier = M
         contentPadding = androidx.compose.foundation.layout.PaddingValues(),
     ) {
         Box(
-            Modifier.fillMaxWidth().background(Brush.horizontalGradient(listOf(MaterialTheme.colorScheme.secondary, MaterialTheme.colorScheme.primary))).padding(vertical = 14.dp),
+            Modifier.fillMaxWidth().background(Brush.horizontalGradient(listOf(MaterialTheme.colorScheme.secondary, MaterialTheme.colorScheme.primary))).padding(vertical = 15.dp),
             contentAlignment = Alignment.Center,
         ) { Text(text, style = MaterialTheme.typography.titleMedium, color = Color.White) }
     }
@@ -226,36 +210,30 @@ fun ErrorText(message: String?) {
 @Composable
 fun ChoicePill(text: String, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Surface(
-        modifier = modifier.clickable(onClick = onClick),
-        shape = MaterialTheme.shapes.medium,
+        modifier = modifier.clickable(onClick = onClick), shape = MaterialTheme.shapes.medium,
         color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
         contentColor = if (selected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
     ) {
-        Box(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), contentAlignment = Alignment.Center) {
-            Text(text, style = MaterialTheme.typography.labelLarge)
-        }
+        Box(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), contentAlignment = Alignment.Center) { Text(text, style = MaterialTheme.typography.labelLarge) }
     }
 }
 
 @Composable
 fun ResultCard(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.large,
+        modifier = modifier.fillMaxWidth(), shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-    ) {
-        Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) { content() }
-    }
+    ) { Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) { content() } }
 }
 
 @Composable
 fun StatTile(label: String, value: String, modifier: Modifier = Modifier) {
     Surface(modifier = modifier, shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.surfaceVariant) {
         Column(Modifier.padding(14.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(value, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+            Text(value, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
             Spacer(Modifier.height(4.dp))
-            Text(label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
         }
     }
 }
