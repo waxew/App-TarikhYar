@@ -1,4 +1,4 @@
-# Workflow عمومی فقط سورس را تست و APK Release بدون امضا را به عنوان Artifact ذخیره می‌کند.
+# Workflow عمومی سورس را با استاندارد کامنت‌گذاری پروژه تست و APK Release بدون امضا را به عنوان Artifact ذخیره می‌کند.
 name: Validate TarikhYar Build
 
 on:
@@ -34,6 +34,9 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: "8.13"
+
+      - name: Apply educational source comments
+        run: python3 tools/apply_source_comments.py
 
       - name: Run unit tests
         run: gradle testDebugUnitTest --stacktrace
