@@ -15,15 +15,18 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 // راهنما: این import وابستگی «androidx.compose.foundation.layout.PaddingValues» را برای استفاده در این فایل وارد می‌کند.
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 // راهنما: این import وابستگی «androidx.compose.foundation.layout.fillMaxSize» را برای استفاده در این فایل وارد می‌کند.
 import androidx.compose.foundation.layout.fillMaxSize
 // راهنما: این import وابستگی «androidx.compose.foundation.layout.fillMaxWidth» را برای استفاده در این فایل وارد می‌کند.
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 // راهنما: این import وابستگی «androidx.compose.foundation.layout.padding» را برای استفاده در این فایل وارد می‌کند.
 import androidx.compose.foundation.layout.padding
 // راهنما: این import وابستگی «androidx.compose.foundation.lazy.LazyColumn» را برای استفاده در این فایل وارد می‌کند.
 import androidx.compose.foundation.lazy.LazyColumn
 // راهنما: این import وابستگی «androidx.compose.material3.MaterialTheme» را برای استفاده در این فایل وارد می‌کند.
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 // راهنما: این import وابستگی «androidx.compose.material3.Text» را برای استفاده در این فایل وارد می‌کند.
 import androidx.compose.material3.Text
@@ -65,7 +68,7 @@ fun AboutUsScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
         // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
         AppTopBar("درباره ما", onBack) {
             // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
-            shareText(context, "درباره تاریخ‌یار", "گروه توسعه و برنامه نویسی AS Team")
+            shareText(context, "درباره تاریخ‌یار", "گروه توسعه فناوری و نرم افزاری as Team")
         // راهنما: این خط محدوده بلوک یا فراخوانی فعلی را باز یا بسته می‌کند.
         }
         // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
@@ -73,7 +76,7 @@ fun AboutUsScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
             // راهنما: این Text متن مورد نیاز رابط کاربری را نمایش می‌دهد.
             Text(
                 // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
-                text = "گروه توسعه و برنامه نویسی AS Team",
+                text = "گروه توسعه فناوری و نرم افزاری as Team",
                 // راهنما: این Modifier اندازه، فاصله، چیدمان یا رفتار ظاهری مؤلفه Compose را تنظیم می‌کند.
                 modifier = Modifier.fillMaxWidth(),
                 // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
@@ -111,7 +114,7 @@ fun ContactUsScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
     // راهنما: این val یک مقدار فقط‌خواندنی را برای استفاده در منطق جاری نگهداری می‌کند.
     val context = LocalContext.current
     // راهنما: این val یک مقدار فقط‌خواندنی را برای استفاده در منطق جاری نگهداری می‌کند.
-    val supportEmail = "as.team.support@gmail.com"
+    val supportEmail = "AS.Support.info@Gmail.com"
 
     // راهنما: این Column اجزای رابط کاربری را به صورت عمودی کنار هم قرار می‌دهد.
     Column(modifier.fillMaxSize()) {
@@ -126,7 +129,7 @@ fun ContactUsScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
             // راهنما: این Text متن مورد نیاز رابط کاربری را نمایش می‌دهد.
             Text(
                 // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
-                text = "گروه توسعه و برنامه نویسی AS Team",
+                text = "گروه توسعه فناوری و نرم افزاری as Team",
                 // راهنما: این Modifier اندازه، فاصله، چیدمان یا رفتار ظاهری مؤلفه Compose را تنظیم می‌کند.
                 modifier = Modifier.fillMaxWidth(),
                 // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.

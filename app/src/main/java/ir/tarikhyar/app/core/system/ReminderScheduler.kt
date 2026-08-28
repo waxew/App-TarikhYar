@@ -1,174 +1,360 @@
+// [AS-TEAM-COMMENTED-V1] توضیحات خودکار آموزشی این فایل فعال شده است.
+// راهنما: این خط پکیج فایل را مشخص می‌کند تا کلاس‌ها در مسیر درست پروژه قرار بگیرند.
 package ir.tarikhyar.app.core.system
 
+// راهنما: این import وابستگی «android.app.AlarmManager» را برای استفاده در این فایل وارد می‌کند.
 import android.app.AlarmManager
+// راهنما: این import وابستگی «android.app.PendingIntent» را برای استفاده در این فایل وارد می‌کند.
 import android.app.PendingIntent
+// راهنما: این import وابستگی «android.content.BroadcastReceiver» را برای استفاده در این فایل وارد می‌کند.
 import android.content.BroadcastReceiver
+// راهنما: این import وابستگی «android.content.Context» را برای استفاده در این فایل وارد می‌کند.
 import android.content.Context
+// راهنما: این import وابستگی «android.content.Intent» را برای استفاده در این فایل وارد می‌کند.
 import android.content.Intent
+// راهنما: این import وابستگی «ir.tarikhyar.app.core.data.LocalDataRepository» را برای استفاده در این فایل وارد می‌کند.
 import ir.tarikhyar.app.core.data.LocalDataRepository
+// راهنما: این import وابستگی «ir.tarikhyar.app.core.data.PersonProfile» را برای استفاده در این فایل وارد می‌کند.
 import ir.tarikhyar.app.core.data.PersonProfile
+// راهنما: این import وابستگی «ir.tarikhyar.app.core.data.PersonalEvent» را برای استفاده در این فایل وارد می‌کند.
 import ir.tarikhyar.app.core.data.PersonalEvent
+// راهنما: این import وابستگی «ir.tarikhyar.app.core.date.PersianCalendar» را برای استفاده در این فایل وارد می‌کند.
 import ir.tarikhyar.app.core.date.PersianCalendar
+// راهنما: این import وابستگی «ir.tarikhyar.app.core.date.PersianDate» را برای استفاده در این فایل وارد می‌کند.
 import ir.tarikhyar.app.core.date.PersianDate
+// راهنما: این import وابستگی «java.time.LocalDateTime» را برای استفاده در این فایل وارد می‌کند.
 import java.time.LocalDateTime
+// راهنما: این import وابستگی «java.time.ZoneId» را برای استفاده در این فایل وارد می‌کند.
 import java.time.ZoneId
 
 /** زمان‌بندی یادآوری‌های محلی تولد و مناسبت بدون نیاز به سرور انجام می‌شود. */
+// راهنما: این object یک نمونه Singleton برای سرویس یا داده مشترک برنامه ایجاد می‌کند.
 object ReminderScheduler {
+    // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
     private const val ACTION = "ir.tarikhyar.app.REMINDER"
 
+    // راهنما: این خط یک تابع را تعریف می‌کند؛ دستورات داخل بلوک وظیفه همان تابع را اجرا می‌کنند.
     fun scheduleAll(context: Context) {
+        // راهنما: این شرط بررسی می‌کند کدام مسیر منطقی باید اجرا شود.
         if (UserSettings.birthdayNotifications(context)) {
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
             LocalDataRepository.profiles(context)
+                // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
                 .filter { it.reminderEnabled }
+                // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
                 .forEach { scheduleProfile(context, it) }
+        // راهنما: این خط محدوده بلوک یا فراخوانی فعلی را باز یا بسته می‌کند.
         }
+        // راهنما: این شرط بررسی می‌کند کدام مسیر منطقی باید اجرا شود.
         if (UserSettings.eventNotifications(context)) {
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
             LocalDataRepository.events(context)
+                // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
                 .filter { it.reminderEnabled }
+                // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
                 .forEach { scheduleEvent(context, it) }
+        // راهنما: این خط محدوده بلوک یا فراخوانی فعلی را باز یا بسته می‌کند.
         }
+        // راهنما: این شرط بررسی می‌کند کدام مسیر منطقی باید اجرا شود.
         if (UserSettings.milestoneNotifications(context)) {
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
             LocalDataRepository.profiles(context).forEach { scheduleMilestone(context, it) }
+        // راهنما: این خط محدوده بلوک یا فراخوانی فعلی را باز یا بسته می‌کند.
         }
+    // راهنما: این خط محدوده بلوک یا فراخوانی فعلی را باز یا بسته می‌کند.
     }
 
+    // راهنما: این خط یک تابع را تعریف می‌کند؛ دستورات داخل بلوک وظیفه همان تابع را اجرا می‌کنند.
     fun scheduleProfile(context: Context, profile: PersonProfile) {
+        // راهنما: این شرط بررسی می‌کند کدام مسیر منطقی باید اجرا شود.
         if (!UserSettings.birthdayNotifications(context)) return
+        // راهنما: این val یک مقدار فقط‌خواندنی را برای استفاده در منطق جاری نگهداری می‌کند.
         val today = PersianCalendar.fromGregorian(java.time.LocalDate.now())
+        // راهنما: این val یک مقدار فقط‌خواندنی را برای استفاده در منطق جاری نگهداری می‌کند.
         val thisYearDay = profile.birthDate.day.coerceAtMost(PersianCalendar.monthLength(today.year, profile.birthDate.month))
+        // راهنما: این var یک مقدار قابل تغییر را نگهداری می‌کند که در ادامه منطق به‌روزرسانی می‌شود.
         var target = PersianDate(today.year, profile.birthDate.month, thisYearDay)
-        if (PersianCalendar.compare(target, today) < 0) {
-            val nextYear = today.year + 1
-            target = PersianDate(
-                nextYear,
-                profile.birthDate.month,
-                profile.birthDate.day.coerceAtMost(PersianCalendar.monthLength(nextYear, profile.birthDate.month)),
-            )
-        }
-        schedule(
-            context = context,
-            requestCode = stableCode("profile:${profile.id}"),
-            target = target,
-            title = "یادآوری تولد ${profile.name}",
-            text = "امروز تولد ${profile.name} است 🎂",
-            type = "profile",
-            itemId = profile.id,
-        )
-    }
 
-    fun scheduleEvent(context: Context, event: PersonalEvent) {
-        if (!UserSettings.eventNotifications(context)) return
-        val today = PersianCalendar.fromGregorian(java.time.LocalDate.now())
-        if (PersianCalendar.compare(event.date, today) < 0) return
-        schedule(
-            context = context,
-            requestCode = stableCode("event:${event.id}"),
-            target = event.date,
-            title = "یادآوری ${event.title}",
-            text = event.note.ifBlank { "امروز ${event.title} است." },
-            type = "event",
-            itemId = event.id,
-        )
-    }
-
-    private fun scheduleMilestone(context: Context, profile: PersonProfile) {
-        val today = PersianCalendar.fromGregorian(java.time.LocalDate.now())
-        val milestones = listOf(
-            4 to "آمادگی پیش‌دبستانی ۱",
-            5 to "آمادگی پیش‌دبستانی ۲",
-            6 to "رسیدن به سن شروع دبستان",
-            18 to "رسیدن به ۱۸ سالگی",
-        )
-        val next = milestones
-            .map { (age, title) -> Triple(age, title, PersianCalendar.addYears(profile.birthDate, age.toLong())) }
-            .firstOrNull { (_, _, date) -> PersianCalendar.compare(date, today) >= 0 }
-            ?: return
-        val (age, title, date) = next
-        schedule(
-            context = context,
-            requestCode = stableCode("milestone:${profile.id}:$age"),
-            target = date,
-            title = "رویداد سنی ${profile.name}",
-            text = "$title برای ${profile.name} فرا رسیده است.",
-            type = "milestone",
-            itemId = profile.id,
-        )
-    }
-
-    private fun schedule(
-        context: Context,
-        requestCode: Int,
-        target: PersianDate,
-        title: String,
-        text: String,
-        type: String,
-        itemId: String,
-    ) {
-        if (!AppPreferences.notificationsEnabled(context)) return
-        val gregorian = PersianCalendar.toGregorian(target)
-        val dateTime = LocalDateTime.of(
-            gregorian.year,
-            gregorian.monthValue,
-            gregorian.dayOfMonth,
+        // اگر تاریخ تولد امروز است ولی ساعت یادآوری گذشته، Alarm باید برای سال بعد ساخته شود.
+        // راهنما: این val یک مقدار فقط‌خواندنی را برای استفاده در منطق جاری نگهداری می‌کند.
+        val targetGregorian = PersianCalendar.toGregorian(target)
+        // راهنما: این val یک مقدار فقط‌خواندنی را برای استفاده در منطق جاری نگهداری می‌کند.
+        val targetDateTime = LocalDateTime.of(
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            targetGregorian.year,
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            targetGregorian.monthValue,
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            targetGregorian.dayOfMonth,
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
             UserSettings.reminderHour(context),
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
             0,
+        // راهنما: این خط محدوده بلوک یا فراخوانی فعلی را باز یا بسته می‌کند.
         )
+        // راهنما: این val یک مقدار فقط‌خواندنی را برای استفاده در منطق جاری نگهداری می‌کند.
+        val reminderMomentPassed = targetDateTime
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            .atZone(ZoneId.systemDefault())
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            .toInstant()
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            .toEpochMilli() <= System.currentTimeMillis()
+
+        // راهنما: این شرط بررسی می‌کند کدام مسیر منطقی باید اجرا شود.
+        if (PersianCalendar.compare(target, today) < 0 || reminderMomentPassed) {
+            // راهنما: این val یک مقدار فقط‌خواندنی را برای استفاده در منطق جاری نگهداری می‌کند.
+            val nextYear = today.year + 1
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            target = PersianDate(
+                // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+                nextYear,
+                // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+                profile.birthDate.month,
+                // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+                profile.birthDate.day.coerceAtMost(PersianCalendar.monthLength(nextYear, profile.birthDate.month)),
+            // راهنما: این خط محدوده بلوک یا فراخوانی فعلی را باز یا بسته می‌کند.
+            )
+        // راهنما: این خط محدوده بلوک یا فراخوانی فعلی را باز یا بسته می‌کند.
+        }
+        // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+        schedule(
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            context = context,
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            requestCode = stableCode("profile:${profile.id}"),
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            target = target,
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            title = "یادآوری تولد ${profile.name}",
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            text = "امروز تولد ${profile.name} است 🎂",
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            type = "profile",
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            itemId = profile.id,
+        // راهنما: این خط محدوده بلوک یا فراخوانی فعلی را باز یا بسته می‌کند.
+        )
+    // راهنما: این خط محدوده بلوک یا فراخوانی فعلی را باز یا بسته می‌کند.
+    }
+
+    // راهنما: این خط یک تابع را تعریف می‌کند؛ دستورات داخل بلوک وظیفه همان تابع را اجرا می‌کنند.
+    fun scheduleEvent(context: Context, event: PersonalEvent) {
+        // راهنما: این شرط بررسی می‌کند کدام مسیر منطقی باید اجرا شود.
+        if (!UserSettings.eventNotifications(context)) return
+        // راهنما: این val یک مقدار فقط‌خواندنی را برای استفاده در منطق جاری نگهداری می‌کند.
+        val today = PersianCalendar.fromGregorian(java.time.LocalDate.now())
+        // راهنما: این شرط بررسی می‌کند کدام مسیر منطقی باید اجرا شود.
+        if (PersianCalendar.compare(event.date, today) < 0) return
+        // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+        schedule(
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            context = context,
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            requestCode = stableCode("event:${event.id}"),
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            target = event.date,
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            title = "یادآوری ${event.title}",
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            text = event.note.ifBlank { "امروز ${event.title} است." },
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            type = "event",
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            itemId = event.id,
+        // راهنما: این خط محدوده بلوک یا فراخوانی فعلی را باز یا بسته می‌کند.
+        )
+    // راهنما: این خط محدوده بلوک یا فراخوانی فعلی را باز یا بسته می‌کند.
+    }
+
+    // راهنما: این خط یک تابع را تعریف می‌کند؛ دستورات داخل بلوک وظیفه همان تابع را اجرا می‌کنند.
+    private fun scheduleMilestone(context: Context, profile: PersonProfile) {
+        // راهنما: این val یک مقدار فقط‌خواندنی را برای استفاده در منطق جاری نگهداری می‌کند.
+        val today = PersianCalendar.fromGregorian(java.time.LocalDate.now())
+        // راهنما: این val یک مقدار فقط‌خواندنی را برای استفاده در منطق جاری نگهداری می‌کند.
+        val milestones = listOf(
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            4 to "آمادگی پیش‌دبستانی ۱",
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            5 to "آمادگی پیش‌دبستانی ۲",
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            6 to "رسیدن به سن شروع دبستان",
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            18 to "رسیدن به ۱۸ سالگی",
+        // راهنما: این خط محدوده بلوک یا فراخوانی فعلی را باز یا بسته می‌کند.
+        )
+        // راهنما: این val یک مقدار فقط‌خواندنی را برای استفاده در منطق جاری نگهداری می‌کند.
+        val next = milestones
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            .map { (age, title) -> Triple(age, title, PersianCalendar.addYears(profile.birthDate, age.toLong())) }
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            .firstOrNull { (_, _, date) -> PersianCalendar.compare(date, today) >= 0 }
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            ?: return
+        // راهنما: این val یک مقدار فقط‌خواندنی را برای استفاده در منطق جاری نگهداری می‌کند.
+        val (age, title, date) = next
+        // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+        schedule(
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            context = context,
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            requestCode = stableCode("milestone:${profile.id}:$age"),
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            target = date,
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            title = "رویداد سنی ${profile.name}",
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            text = "$title برای ${profile.name} فرا رسیده است.",
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            type = "milestone",
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            itemId = profile.id,
+        // راهنما: این خط محدوده بلوک یا فراخوانی فعلی را باز یا بسته می‌کند.
+        )
+    // راهنما: این خط محدوده بلوک یا فراخوانی فعلی را باز یا بسته می‌کند.
+    }
+
+    // راهنما: این خط یک تابع را تعریف می‌کند؛ دستورات داخل بلوک وظیفه همان تابع را اجرا می‌کنند.
+    private fun schedule(
+        // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+        context: Context,
+        // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+        requestCode: Int,
+        // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+        target: PersianDate,
+        // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+        title: String,
+        // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+        text: String,
+        // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+        type: String,
+        // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+        itemId: String,
+    // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+    ) {
+        // راهنما: این شرط بررسی می‌کند کدام مسیر منطقی باید اجرا شود.
+        if (!AppPreferences.notificationsEnabled(context)) return
+        // راهنما: این val یک مقدار فقط‌خواندنی را برای استفاده در منطق جاری نگهداری می‌کند.
+        val gregorian = PersianCalendar.toGregorian(target)
+        // راهنما: این val یک مقدار فقط‌خواندنی را برای استفاده در منطق جاری نگهداری می‌کند.
+        val dateTime = LocalDateTime.of(
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            gregorian.year,
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            gregorian.monthValue,
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            gregorian.dayOfMonth,
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            UserSettings.reminderHour(context),
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
+            0,
+        // راهنما: این خط محدوده بلوک یا فراخوانی فعلی را باز یا بسته می‌کند.
+        )
+        // راهنما: این val یک مقدار فقط‌خواندنی را برای استفاده در منطق جاری نگهداری می‌کند.
         val millis = dateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        // راهنما: این شرط بررسی می‌کند کدام مسیر منطقی باید اجرا شود.
         if (millis <= System.currentTimeMillis()) return
 
+        // راهنما: این val یک مقدار فقط‌خواندنی را برای استفاده در منطق جاری نگهداری می‌کند.
         val intent = Intent(context, ReminderReceiver::class.java).apply {
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
             action = ACTION
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
             putExtra("title", title)
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
             putExtra("text", text)
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
             putExtra("type", type)
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
             putExtra("itemId", itemId)
+        // راهنما: این خط محدوده بلوک یا فراخوانی فعلی را باز یا بسته می‌کند.
         }
+        // راهنما: این val یک مقدار فقط‌خواندنی را برای استفاده در منطق جاری نگهداری می‌کند.
         val pending = PendingIntent.getBroadcast(
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
             context,
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
             requestCode,
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
             intent,
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        // راهنما: این خط محدوده بلوک یا فراخوانی فعلی را باز یا بسته می‌کند.
         )
+        // راهنما: این val یک مقدار فقط‌خواندنی را برای استفاده در منطق جاری نگهداری می‌کند.
         val alarmManager = context.getSystemService(AlarmManager::class.java)
+        // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
         alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, millis, pending)
+    // راهنما: این خط محدوده بلوک یا فراخوانی فعلی را باز یا بسته می‌کند.
     }
 
+    // راهنما: این خط یک تابع را تعریف می‌کند؛ دستورات داخل بلوک وظیفه همان تابع را اجرا می‌کنند.
     private fun stableCode(value: String): Int = value.hashCode() and 0x7fffffff
+// راهنما: این خط محدوده بلوک یا فراخوانی فعلی را باز یا بسته می‌کند.
 }
 
 /** Receiver یادآوری را نمایش می‌دهد و تولد سالانه را برای سال بعد دوباره زمان‌بندی می‌کند. */
+// راهنما: این خط یک کلاس و مسئولیت مشخص آن را در معماری برنامه تعریف می‌کند.
 class ReminderReceiver : BroadcastReceiver() {
+    // راهنما: این خط یک تابع را تعریف می‌کند؛ دستورات داخل بلوک وظیفه همان تابع را اجرا می‌کنند.
     override fun onReceive(context: Context, intent: Intent) {
+        // راهنما: این val یک مقدار فقط‌خواندنی را برای استفاده در منطق جاری نگهداری می‌کند.
         val type = intent.getStringExtra("type").orEmpty()
+        // راهنما: این val یک مقدار فقط‌خواندنی را برای استفاده در منطق جاری نگهداری می‌کند.
         val id = intent.getStringExtra("itemId").orEmpty()
+        // راهنما: این val یک مقدار فقط‌خواندنی را برای استفاده در منطق جاری نگهداری می‌کند.
         val allowed = when (type) {
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
             "profile" -> UserSettings.birthdayNotifications(context) &&
+                // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
                 LocalDataRepository.profiles(context).any { it.id == id && it.reminderEnabled }
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
             "event" -> UserSettings.eventNotifications(context) &&
+                // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
                 LocalDataRepository.events(context).any { it.id == id && it.reminderEnabled }
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
             "milestone" -> UserSettings.milestoneNotifications(context)
+            // راهنما: این شاخه زمانی اجرا می‌شود که شرط‌های قبلی برقرار نباشند.
             else -> true
+        // راهنما: این خط محدوده بلوک یا فراخوانی فعلی را باز یا بسته می‌کند.
         }
+        // راهنما: این شرط بررسی می‌کند کدام مسیر منطقی باید اجرا شود.
         if (!allowed) return
 
+        // راهنما: این val یک مقدار فقط‌خواندنی را برای استفاده در منطق جاری نگهداری می‌کند.
         val title = intent.getStringExtra("title") ?: "یادآوری تاریخ‌یار"
+        // راهنما: این val یک مقدار فقط‌خواندنی را برای استفاده در منطق جاری نگهداری می‌کند.
         val text = intent.getStringExtra("text") ?: "یک رویداد برای امروز دارید."
+        // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
         NotificationHelper.showReminder(context, title, text)
 
+        // راهنما: این شرط بررسی می‌کند کدام مسیر منطقی باید اجرا شود.
         if (type == "profile") {
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
             LocalDataRepository.profiles(context).firstOrNull { it.id == id }?.let {
+                // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
                 ReminderScheduler.scheduleProfile(context, it)
+            // راهنما: این خط محدوده بلوک یا فراخوانی فعلی را باز یا بسته می‌کند.
             }
+        // راهنما: این خط محدوده بلوک یا فراخوانی فعلی را باز یا بسته می‌کند.
         }
+    // راهنما: این خط محدوده بلوک یا فراخوانی فعلی را باز یا بسته می‌کند.
     }
+// راهنما: این خط محدوده بلوک یا فراخوانی فعلی را باز یا بسته می‌کند.
 }
 
 /** پس از روشن‌شدن مجدد دستگاه، Alarmهای محلی از روی داده‌های ذخیره‌شده بازسازی می‌شوند. */
+// راهنما: این خط یک کلاس و مسئولیت مشخص آن را در معماری برنامه تعریف می‌کند.
 class BootReceiver : BroadcastReceiver() {
+    // راهنما: این خط یک تابع را تعریف می‌کند؛ دستورات داخل بلوک وظیفه همان تابع را اجرا می‌کنند.
     override fun onReceive(context: Context, intent: Intent) {
+        // راهنما: این شرط بررسی می‌کند کدام مسیر منطقی باید اجرا شود.
         if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
+            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
             ReminderScheduler.scheduleAll(context)
+        // راهنما: این خط محدوده بلوک یا فراخوانی فعلی را باز یا بسته می‌کند.
         }
+    // راهنما: این خط محدوده بلوک یا فراخوانی فعلی را باز یا بسته می‌کند.
     }
+// راهنما: این خط محدوده بلوک یا فراخوانی فعلی را باز یا بسته می‌کند.
 }
