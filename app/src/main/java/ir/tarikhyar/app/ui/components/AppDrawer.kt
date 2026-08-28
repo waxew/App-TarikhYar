@@ -1,191 +1,154 @@
-// [AS-TEAM-COMMENTED-V1] توضیحات خودکار آموزشی این فایل فعال شده است.
-// این فایل محتوای منوی همبرگری تاریخ‌یار را نگهداری می‌کند.
-// راهنما: این خط پکیج فایل را مشخص می‌کند تا کلاس‌ها در مسیر درست پروژه قرار بگیرند.
 package ir.tarikhyar.app.ui.components
 
-// راهنما: این import وابستگی «androidx.compose.foundation.layout.Arrangement» را برای استفاده در این فایل وارد می‌کند.
+import android.content.Intent
+import android.graphics.BitmapFactory
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-// راهنما: این import وابستگی «androidx.compose.foundation.layout.Column» را برای استفاده در این فایل وارد می‌کند.
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-// راهنما: این import وابستگی «androidx.compose.foundation.layout.Spacer» را برای استفاده در این فایل وارد می‌کند.
 import androidx.compose.foundation.layout.Spacer
-// راهنما: این import وابستگی «androidx.compose.foundation.layout.fillMaxHeight» را برای استفاده در این فایل وارد می‌کند.
 import androidx.compose.foundation.layout.fillMaxHeight
-// راهنما: این import وابستگی «androidx.compose.foundation.layout.padding» را برای استفاده در این فایل وارد می‌کند.
 import androidx.compose.foundation.layout.padding
-// راهنما: این import وابستگی «androidx.compose.foundation.layout.size» را برای استفاده در این فایل وارد می‌کند.
 import androidx.compose.foundation.layout.size
-// راهنما: این import وابستگی «androidx.compose.foundation.layout.width» را برای استفاده در این فایل وارد می‌کند.
 import androidx.compose.foundation.layout.width
-// راهنما: این import وابستگی «androidx.compose.material.icons.Icons» را برای استفاده در این فایل وارد می‌کند.
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-// راهنما: این import وابستگی «androidx.compose.material.icons.rounded.ContactMail» را برای استفاده در این فایل وارد می‌کند.
+import androidx.compose.material.icons.rounded.Backup
+import androidx.compose.material.icons.rounded.CalendarMonth
 import androidx.compose.material.icons.rounded.ContactMail
-// راهنما: این import وابستگی «androidx.compose.material.icons.rounded.Info» را برای استفاده در این فایل وارد می‌کند.
+import androidx.compose.material.icons.rounded.Event
+import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Info
-// راهنما: این import وابستگی «androidx.compose.material.icons.rounded.Settings» را برای استفاده در این فایل وارد می‌کند.
+import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Settings
-// راهنما: این import وابستگی «androidx.compose.material.icons.rounded.Share» را برای استفاده در این فایل وارد می‌کند.
 import androidx.compose.material.icons.rounded.Share
-// راهنما: این import وابستگی «androidx.compose.material.icons.rounded.SupervisorAccount» را برای استفاده در این فایل وارد می‌کند.
 import androidx.compose.material.icons.rounded.SupervisorAccount
-// راهنما: این import وابستگی «androidx.compose.material3.HorizontalDivider» را برای استفاده در این فایل وارد می‌کند.
+import androidx.compose.material.icons.rounded.Tune
 import androidx.compose.material3.HorizontalDivider
-// راهنما: این import وابستگی «androidx.compose.material3.Icon» را برای استفاده در این فایل وارد می‌کند.
 import androidx.compose.material3.Icon
-// راهنما: این import وابستگی «androidx.compose.material3.MaterialTheme» را برای استفاده در این فایل وارد می‌کند.
 import androidx.compose.material3.MaterialTheme
-// راهنما: این import وابستگی «androidx.compose.material3.ModalDrawerSheet» را برای استفاده در این فایل وارد می‌کند.
 import androidx.compose.material3.ModalDrawerSheet
-// راهنما: این import وابستگی «androidx.compose.material3.NavigationDrawerItem» را برای استفاده در این فایل وارد می‌کند.
 import androidx.compose.material3.NavigationDrawerItem
-// راهنما: این import وابستگی «androidx.compose.material3.Text» را برای استفاده در این فایل وارد می‌کند.
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-// راهنما: این import وابستگی «androidx.compose.runtime.Composable» را برای استفاده در این فایل وارد می‌کند.
 import androidx.compose.runtime.Composable
-// راهنما: این import وابستگی «androidx.compose.ui.Modifier» را برای استفاده در این فایل وارد می‌کند.
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-// راهنما: این import وابستگی «androidx.compose.ui.text.font.FontWeight» را برای استفاده در این فایل وارد می‌کند.
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-// راهنما: این import وابستگی «androidx.compose.ui.unit.dp» را برای استفاده در این فایل وارد می‌کند.
 import androidx.compose.ui.unit.dp
-// راهنما: این import وابستگی «ir.tarikhyar.app.AppScreen» را برای استفاده در این فایل وارد می‌کند.
 import ir.tarikhyar.app.AppScreen
+import ir.tarikhyar.app.core.system.UserSettings
 
-// راهنما: این Annotation مشخص می‌کند تابع بعدی بخشی از رابط کاربری Jetpack Compose است.
+/** منوی همبرگری نسخه ۲ با پروفایل، تصویر کاربر و مسیرهای جدید برنامه. */
 @Composable
-// راهنما: این خط یک تابع را تعریف می‌کند؛ دستورات داخل بلوک وظیفه همان تابع را اجرا می‌کنند.
 fun AppDrawerContent(
-    // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
     currentScreen: AppScreen,
-    // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
     onNavigate: (AppScreen) -> Unit,
-    // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
     onShare: () -> Unit,
-// راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
 ) {
-    // در RTL، ModalDrawerSheet از سمت راست نمایش داده می‌شود و عرض آن برای گوشی محدود شده است.
-    // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
-    ModalDrawerSheet(
-        // راهنما: این Modifier اندازه، فاصله، چیدمان یا رفتار ظاهری مؤلفه Compose را تنظیم می‌کند.
-        modifier = Modifier
-            // راهنما: این Modifier اندازه، فاصله، چیدمان یا رفتار ظاهری مؤلفه Compose را تنظیم می‌کند.
-            .fillMaxHeight()
-            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
-            .width(310.dp),
-    // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
-    ) {
-        // راهنما: این Column اجزای رابط کاربری را به صورت عمودی کنار هم قرار می‌دهد.
-        Column(
-            // راهنما: این Modifier اندازه، فاصله، چیدمان یا رفتار ظاهری مؤلفه Compose را تنظیم می‌کند.
-            modifier = Modifier.padding(horizontal = 14.dp, vertical = 20.dp),
-            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-        // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
-        ) {
-            // عنوان Drawer مشخص می‌کند این منو متعلق به کدام برنامه است.
-            // راهنما: این Text متن مورد نیاز رابط کاربری را نمایش می‌دهد.
-            Text(
-                // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
-                text = "تاریخ‌یار",
-                // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
-                style = MaterialTheme.typography.headlineSmall,
-                // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
-                color = MaterialTheme.colorScheme.primary,
-                // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
-                fontWeight = FontWeight.ExtraBold,
-            // راهنما: این خط محدوده بلوک یا فراخوانی فعلی را باز یا بسته می‌کند.
-            )
-            // راهنما: این Text متن مورد نیاز رابط کاربری را نمایش می‌دهد.
-            Text(
-                // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
-                text = "ابزارهای تاریخ و تولد",
-                // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
-                style = MaterialTheme.typography.bodyMedium,
-                // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            // راهنما: این خط محدوده بلوک یا فراخوانی فعلی را باز یا بسته می‌کند.
-            )
-
-            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
-            Spacer(Modifier.size(8.dp))
-            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
-            HorizontalDivider()
-            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
-            Spacer(Modifier.size(4.dp))
-
-            // گزینه تنظیمات به صفحه تنظیمات اختصاصی تاریخ‌یار می‌رود.
-            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
-            NavigationDrawerItem(
-                // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
-                label = { Text("تنظیمات") },
-                // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
-                selected = currentScreen == AppScreen.SETTINGS,
-                // راهنما: این callback عملیاتی را که پس از لمس کاربر باید اجرا شود مشخص می‌کند.
-                onClick = { onNavigate(AppScreen.SETTINGS) },
-                // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
-                icon = { Icon(Icons.Rounded.Settings, contentDescription = null) },
-            // راهنما: این خط محدوده بلوک یا فراخوانی فعلی را باز یا بسته می‌کند.
-            )
-
-            // معرفی به دوستان Share Sheet استاندارد اندروید را باز می‌کند.
-            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
-            NavigationDrawerItem(
-                // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
-                label = { Text("معرفی به دوستان") },
-                // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
-                selected = false,
-                // راهنما: این callback عملیاتی را که پس از لمس کاربر باید اجرا شود مشخص می‌کند.
-                onClick = onShare,
-                // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
-                icon = { Icon(Icons.Rounded.Share, contentDescription = null) },
-            // راهنما: این خط محدوده بلوک یا فراخوانی فعلی را باز یا بسته می‌کند.
-            )
-
-            // درباره ما اطلاعات گروه توسعه‌دهنده را نمایش می‌دهد.
-            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
-            NavigationDrawerItem(
-                // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
-                label = { Text("درباره ما") },
-                // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
-                selected = currentScreen == AppScreen.ABOUT_US,
-                // راهنما: این callback عملیاتی را که پس از لمس کاربر باید اجرا شود مشخص می‌کند.
-                onClick = { onNavigate(AppScreen.ABOUT_US) },
-                // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
-                icon = { Icon(Icons.Rounded.SupervisorAccount, contentDescription = null) },
-            // راهنما: این خط محدوده بلوک یا فراخوانی فعلی را باز یا بسته می‌کند.
-            )
-
-            // تماس با ما ایمیل پشتیبانی را در یک صفحه مستقل نمایش می‌دهد.
-            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
-            NavigationDrawerItem(
-                // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
-                label = { Text("تماس با ما") },
-                // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
-                selected = currentScreen == AppScreen.CONTACT_US,
-                // راهنما: این callback عملیاتی را که پس از لمس کاربر باید اجرا شود مشخص می‌کند.
-                onClick = { onNavigate(AppScreen.CONTACT_US) },
-                // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
-                icon = { Icon(Icons.Rounded.ContactMail, contentDescription = null) },
-            // راهنما: این خط محدوده بلوک یا فراخوانی فعلی را باز یا بسته می‌کند.
-            )
-
-            // درباره نرم افزار فقط توضیح کوتاه برنامه و نسخه را نشان می‌دهد؛ اطلاعات فنی بسته نمایش داده نمی‌شود.
-            // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
-            NavigationDrawerItem(
-                // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
-                label = { Text("درباره نرم افزار") },
-                // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
-                selected = currentScreen == AppScreen.ABOUT_APP,
-                // راهنما: این callback عملیاتی را که پس از لمس کاربر باید اجرا شود مشخص می‌کند.
-                onClick = { onNavigate(AppScreen.ABOUT_APP) },
-                // راهنما: این دستور بخشی از منطق، داده یا چیدمان همین بخش را پیاده‌سازی می‌کند.
-                icon = { Icon(Icons.Rounded.Info, contentDescription = null) },
-            // راهنما: این خط محدوده بلوک یا فراخوانی فعلی را باز یا بسته می‌کند.
-            )
-        // راهنما: این خط محدوده بلوک یا فراخوانی فعلی را باز یا بسته می‌کند.
+    val context = LocalContext.current
+    var imageUri by remember { mutableStateOf(UserSettings.profileImageUri(context)) }
+    val imagePicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) {
+            runCatching {
+                context.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            imageUri = uri.toString()
+            UserSettings.setProfileImageUri(context, imageUri)
         }
-    // راهنما: این خط محدوده بلوک یا فراخوانی فعلی را باز یا بسته می‌کند.
     }
-// راهنما: این خط محدوده بلوک یا فراخوانی فعلی را باز یا بسته می‌کند.
+    val bitmap = remember(imageUri) {
+        if (imageUri.isBlank()) null else runCatching {
+            context.contentResolver.openInputStream(android.net.Uri.parse(imageUri))?.use { stream -> BitmapFactory.decodeStream(stream) }
+        }.getOrNull()
+    }
+
+    ModalDrawerSheet(modifier = Modifier.fillMaxHeight().width(320.dp)) {
+        LazyColumn(
+            modifier = Modifier.fillMaxHeight().padding(horizontal = 14.dp, vertical = 18.dp),
+            verticalArrangement = Arrangement.spacedBy(5.dp),
+        ) {
+            item {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Surface(
+                        modifier = Modifier.size(92.dp),
+                        shape = CircleShape,
+                        color = MaterialTheme.colorScheme.primaryContainer,
+                        onClick = { imagePicker.launch(arrayOf("image/*")) },
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            if (bitmap != null) {
+                                Image(bitmap.asImageBitmap(), "تصویر پروفایل", Modifier.size(92.dp).clip(CircleShape))
+                            } else {
+                                Icon(Icons.Rounded.Person, "انتخاب تصویر پروفایل", Modifier.size(48.dp), tint = MaterialTheme.colorScheme.primary)
+                            }
+                        }
+                    }
+                    Spacer(Modifier.size(8.dp))
+                    Text(UserSettings.displayName(context), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                    Text("تاریخ‌یار • تقویم زندگی شما", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+            item { HorizontalDivider(Modifier.padding(vertical = 8.dp)) }
+
+            item { DrawerItem("خانه", Icons.Rounded.Home, AppScreen.HOME, currentScreen, onNavigate) }
+            item { DrawerItem("پروفایل‌ها و تولدها", Icons.Rounded.Person, AppScreen.PROFILES, currentScreen, onNavigate) }
+            item { DrawerItem("تقویم و مناسبت‌ها", Icons.Rounded.CalendarMonth, AppScreen.CALENDAR, currentScreen, onNavigate) }
+            item { DrawerItem("مناسبت‌های شخصی", Icons.Rounded.Event, AppScreen.PERSONAL_EVENTS, currentScreen, onNavigate) }
+            item { DrawerItem("ابزارهای حرفه‌ای", Icons.Rounded.Tune, AppScreen.PRO_TOOLS, currentScreen, onNavigate) }
+            item { DrawerItem("علاقه‌مندی‌ها", Icons.Rounded.Favorite, AppScreen.FAVORITES, currentScreen, onNavigate) }
+            item { DrawerItem("پشتیبان و همگام‌سازی", Icons.Rounded.Backup, AppScreen.BACKUP, currentScreen, onNavigate) }
+            item { DrawerItem("تنظیمات", Icons.Rounded.Settings, AppScreen.SETTINGS, currentScreen, onNavigate) }
+
+            item { HorizontalDivider(Modifier.padding(vertical = 8.dp)) }
+            item {
+                NavigationDrawerItem(
+                    label = { Text("معرفی به دوستان") },
+                    selected = false,
+                    onClick = onShare,
+                    icon = { Icon(Icons.Rounded.Share, null) },
+                )
+            }
+            item { DrawerItem("درباره ما", Icons.Rounded.SupervisorAccount, AppScreen.ABOUT_US, currentScreen, onNavigate) }
+            item { DrawerItem("تماس با ما", Icons.Rounded.ContactMail, AppScreen.CONTACT_US, currentScreen, onNavigate) }
+            item { DrawerItem("درباره نرم افزار", Icons.Rounded.Info, AppScreen.ABOUT_APP, currentScreen, onNavigate) }
+            item {
+                HorizontalDivider(Modifier.padding(top = 14.dp, bottom = 10.dp))
+                Text(
+                    "گروه توسعه فناوری و نرم افزاری as Team",
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Bold,
+                )
+                Text("AS.Support.info@Gmail.com", modifier = Modifier.padding(horizontal = 8.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
+    }
+}
+
+@Composable
+private fun DrawerItem(
+    label: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    target: AppScreen,
+    current: AppScreen,
+    onNavigate: (AppScreen) -> Unit,
+) {
+    NavigationDrawerItem(
+        label = { Text(label) },
+        selected = current == target,
+        onClick = { onNavigate(target) },
+        icon = { Icon(icon, null) },
+    )
 }

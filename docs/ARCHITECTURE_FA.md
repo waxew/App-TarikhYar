@@ -1,54 +1,21 @@
-# معماری تاریخ‌یار
-
-## هدف معماری نسخه 1.6
-
-تاریخ‌یار به شکلی توسعه داده می‌شود که موتور محاسبات تاریخ از UI و سرویس‌های سیستمی مستقل بماند. این جداسازی باعث می‌شود اضافه شدن Widget، تقویم کامل، Backup، تبلیغات یا پرداخت در نسخه‌های بعدی نیازی به بازنویسی منطق اصلی تاریخ نداشته باشد.
+# معماری تاریخ‌یار 2.0
 
 ## لایه‌ها
+- `core/date`: موتور تقویم شمسی و محاسبات تاریخ
+- `core/data`: مدل پروفایل، مناسبت و مخزن محلی JSON/SharedPreferences
+- `core/system`: اعلان، Reminder، Update Checker، تنظیمات، Backup و ساخت کارت Share
+- `core/ui`: Theme و شخصی‌سازی ظاهر
+- `feature/*`: صفحات مستقل Compose
+- `widget`: AppWidget تاریخ شمسی و نزدیک‌ترین تولد
 
-### App Shell
-- `MainActivity.kt`: نقطه ورود Android، ساخت Notification Channel و شروع بررسی بروزرسانی.
-- `TarikhYarApp.kt`: مدیریت Screenها، Back Stack، Drawer و اتصال Featureها.
+## داده‌ها
+برنامه به‌صورت Local-first طراحی شده است. پروفایل‌ها و رویدادها در `tarikhyar_data` و تنظیمات در `tarikhyar_settings` ذخیره می‌شوند. Backup نسخه 2 با PBKDF2-HMAC-SHA256 و AES-256-GCM رمزگذاری می‌شود.
 
-### Core
-- `core/date`: مدل تاریخ شمسی، تبدیل تقویم، کبیسه، اختلاف سن و داده‌های مرتبط با تولد.
-- `core/format`: ارقام فارسی و قالب‌بندی تاریخ/عدد.
-- `core/system`: SharedPreferences، Notification و UpdateChecker.
-- `core/ui/theme`: Theme، Color، Typography و Shapeهای Material 3.
+## ناوبری
+`TarikhYarApp.kt` مقصدهای صفحه را در `AppScreen` نگهداری می‌کند. Back Stack داخلی باعث می‌شود Back به صفحه قبلی برگردد و Drawer در اولویت بسته‌شدن قرار داشته باشد.
 
-### Feature
-هر قابلیت اصلی صفحه و State مخصوص خود را دارد:
-- `feature/home`: داشبورد و ورود به ابزارها.
-- `feature/age`: محاسبه سن.
-- `feature/birthinfo`: اطلاعات تولد در تقویم‌های مختلف.
-- `feature/difference`: اختلاف دو تاریخ.
-- `feature/events`: رویدادها و نقاط عطف سنی.
-- `feature/chinese`: محتوای فرهنگی طالع چینی.
-- `feature/tools`: تبدیل و محاسبات تکمیلی تاریخ.
-- `feature/settings`: تنظیم اعلان و بررسی بروزرسانی.
-- `feature/notifications`: مرکز اعلان‌ها.
-- `feature/about`: درباره ما، تماس با ما و درباره نرم افزار.
+## اعلان
+AlarmManager برای تولد و مناسبت‌های شخصی استفاده می‌شود. پس از Boot، Receiver زمان‌بندی‌ها را بازسازی می‌کند. اعلان Update از `version.json` GitHub به‌صورت اختیاری بررسی می‌شود.
 
-### UI Components
-- `ui/components/CommonComponents.kt`: AppBar، ورودی تاریخ، Button، Card و Share helper.
-- `ui/components/AppDrawer.kt`: منوی همبرگری راست‌چین.
-
-## ناوبری و Back Stack
-
-نسخه 1.6 از Back Stack داخلی در `TarikhYarApp.kt` استفاده می‌کند. هنگام Navigation، Screen فعلی قبل از تغییر ذخیره می‌شود. Back سخت‌افزاری و Back داخل AppBar از همان تاریخچه استفاده می‌کنند. اگر Drawer باز باشد، Back ابتدا Drawer را می‌بندد. در صفحه Home و تاریخچه خالی، رفتار استاندارد Android اجازه خروج از برنامه را دارد.
-
-## جهت رابط کاربری
-
-کل App Shell با `LayoutDirection.Rtl` اجرا می‌شود. Drawer از `Start` باز می‌شود که در RTL سمت راست نمایشگر است. متن‌ها و ترتیب گزینه‌ها برای زبان فارسی طراحی شده‌اند.
-
-## بروزرسانی
-
-`version.json` در Repository نسخه آخر را اعلام می‌کند. `UpdateChecker` با timeout محدود آن را می‌خواند و اگر versionCode جدیدتر باشد، در صورت فعال بودن مجوز، Notification نشان می‌دهد. آخرین versionCode اعلان‌شده ذخیره می‌شود تا اعلان نسخه واحد تکرار نشود.
-
-## داده و حریم خصوصی
-
-نسخه 1.6 حساب کاربری یا دیتابیس ابری ندارد. تنظیمات کوچک مانند وضعیت اعلان در SharedPreferences ذخیره می‌شوند. اینترنت فقط برای بررسی نسخه جدید استفاده می‌شود. در نسخه‌های بعدی اگر Sync یا Crash Reporting اضافه شود، باید اختیاری و با اطلاع کاربر باشد.
-
-## توسعه آینده
-
-قابلیت‌های Widget، تقویم کامل، مناسبت شخصی، Backup، Sync و Monetization باید در لایه‌های مستقل اضافه شوند. SDK تبلیغ یا پرداخت نباید وارد `core/date` شود و منطق محاسبات پایه باید مستقل و قابل تست باقی بماند.
+## انتشار
+CI عمومی فقط Build و تست را انجام می‌دهد و Signing Key خصوصی در GitHub قرار نمی‌گیرد. Artifact بدون امضا پس از CI می‌تواند در محیط امن با Keystore ثابت امضا شود.

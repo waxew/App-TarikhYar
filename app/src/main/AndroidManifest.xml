@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- این Manifest مجوزها و Activity اصلی برنامه تاریخ‌یار را به سیستم‌عامل معرفی می‌کند. -->
+<!-- Manifest مجوزها، Activity، یادآورها، FileProvider و ویجت تاریخ‌یار را معرفی می‌کند. -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- اینترنت فقط برای بررسی version.json و اطلاع از بروزرسانی استفاده می‌شود. -->
+    <!-- اینترنت فقط برای بررسی version.json استفاده می‌شود. -->
     <uses-permission android:name="android.permission.INTERNET" />
-
-    <!-- Android 13 به بالا برای نمایش اعلان نیاز به این مجوز زمان اجرا دارد. -->
+    <!-- Android 13 به بالا برای نمایش اعلان نیاز به مجوز زمان اجرا دارد. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- پس از روشن شدن دستگاه، یادآوری‌های محلی دوباره زمان‌بندی می‌شوند. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
-    <!-- تنظیمات عمومی اپلیکیشن شامل آیکن، نام، RTL و Theme در این بخش قرار دارد. -->
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -16,17 +16,51 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TarikhYar">
 
-        <!-- MainActivity نقطه ورود برنامه است و از Launcher قابل اجراست. -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
-                <!-- این Action مشخص می‌کند MainActivity ورودی اصلی برنامه است. -->
                 <action android:name="android.intent.action.MAIN" />
-
-                <!-- این Category باعث نمایش آیکن تاریخ‌یار در Launcher دستگاه می‌شود. -->
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- FileProvider کارت‌های تصویری تولیدشده را بدون افشای مسیر داخلی Share می‌کند. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.files"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+        <!-- Receiver یادآوری‌های تولد، مناسبت و رویدادهای سنی را دریافت می‌کند. -->
+        <receiver
+            android:name=".core.system.ReminderReceiver"
+            android:exported="false" />
+
+        <!-- پس از Boot، Alarmهای ذخیره‌شده دوباره ساخته می‌شوند. -->
+        <receiver
+            android:name=".core.system.BootReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- ویجت صفحه اصلی تاریخ شمسی و نزدیک‌ترین تولد را نمایش می‌دهد. -->
+        <receiver
+            android:name=".widget.TarikhYarWidgetProvider"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/tarikhyar_widget_info" />
+        </receiver>
     </application>
 </manifest>

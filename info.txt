@@ -1,0 +1,40 @@
+TarikhYar Project Information
+=============================
+App: تاریخ‌یار / TarikhYar
+Version Name: 2.0.0
+Version Code: 20
+Application ID: ir.tarikhyar.app
+Repository: https://github.com/waxew/App-TarikhYar
+Language/UI: Kotlin + Jetpack Compose
+JDK: 17
+Gradle: 8.13
+AGP: 8.13.2
+Kotlin: 2.2.21
+minSdk: 26
+compileSdk: 36
+targetSdk: 36
+
+Release signing certificate (public information)
+------------------------------------------------
+Alias: tarikhyar
+Key algorithm: RSA 4096-bit
+Signature algorithm: SHA384withRSA
+Certificate SHA-256: DA:C0:41:90:7D:62:7E:25:0A:AE:55:D7:F9:0B:A6:58:77:E0:F1:45:CC:BA:55:6B:A1:26:AC:8E:84:C3:BA:38
+Certificate SHA-1: F4:02:39:3F:C6:82:AD:E6:E6:6B:92:E4:BD:9C:8C:6B:3E:12:70:66
+Certificate validity: 2026-08-25 through 2054-01-10
+
+IMPORTANT
+---------
+The private JKS and its passwords MUST NOT be committed to the public GitHub repository.
+The downloadable private source archive delivered to the project owner contains a private-signing folder with the JKS backup and credentials.
+All future public releases must use this exact signing certificate for update compatibility.
+
+Version checking
+----------------
+Remote metadata: https://raw.githubusercontent.com/waxew/App-TarikhYar/main/version.json
+
+Data/backup
+-----------
+Local data: SharedPreferences (tarikhyar_data + tarikhyar_settings)
+Backup format: TYBK2
+Backup encryption: PBKDF2WithHmacSHA256 + AES-256-GCM

@@ -7,3 +7,7 @@ local.properties
 captures/
 .externalNativeBuild/
 .cxx/
+# Private release signing material must never be committed to the public repository.
+*.jks
+*.keystore
+private-signing/
