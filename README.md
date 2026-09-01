@@ -2,6 +2,13 @@
 
 تاریخ‌یار یک برنامه فارسی Android برای محاسبه سن، تبدیل و مقایسه تاریخ، اطلاعات تولد، تقویم شمسی و مدیریت رویدادهای شخصی است. محاسبات اصلی آفلاین انجام می‌شوند و اینترنت فقط برای بررسی اختیاری نسخه جدید استفاده می‌شود.
 
+## Figma Product Master
+مرجع یکپارچه طراحی، Screenها، Design System، Flowها و معماری پروژه در Figma:
+
+https://www.figma.com/design/k6zg11yiKZ3m3Yy4LtuG7S
+
+نگاشت Nodeهای Figma به فایل‌های Kotlin/Jetpack Compose در `docs/FIGMA_HANDOFF.md` نگهداری می‌شود.
+
 ## نسخه فعلی
 - Version Name: `2.0.0`
 - Version Code: `20`
@@ -46,6 +53,7 @@
 پروژه با JDK 17، Gradle 8.13، AGP 8.13.2 و Kotlin 2.2.21 ساخته می‌شود. Workflow عمومی GitHub تست‌ها و Release بدون امضا را Build می‌کند؛ Signing نهایی باید در محیط خصوصی انجام شود.
 
 ## مستندات
+- `docs/FIGMA_HANDOFF.md`
 - `docs/ARCHITECTURE_FA.md`
 - `docs/PUBLISHING_FA.md`
 - `docs/ROADMAP_FA.md`
